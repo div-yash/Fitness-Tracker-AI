@@ -1,0 +1,47 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header bg-primary text-white text-center">
+            <h5 class="mb-0">Add Feedback</h5>
+          </div>
+  
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Feedback</label>
+              <textarea class="form-control"
+                        rows="4"
+                        placeholder="We would love to hear your thoughts..."
+                        [(ngModel)]="feedbackText">
+              </textarea>
+            </div>
+  
+            <div class="text-center">
+              <button class="btn btn-success px-4" (click)="submitFeedback()">
+                Submit
+              </button>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+  
+  <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="feedbackModalLabel">Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p>{{message}}</p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+

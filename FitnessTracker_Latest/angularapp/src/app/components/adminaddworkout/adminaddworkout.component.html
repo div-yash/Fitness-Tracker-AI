@@ -1,0 +1,121 @@
+<div class="container-fluid min-vh-100 d-flex flex-column">
+
+    <div class="row flex-grow-1 justify-content-center align-items-start">
+        <div class="col-12 col-md-6 col-lg-4">
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-body p-4">
+
+                <h4 class="text-center fw-semibold mb-3">Create New Workout</h4>
+                <div class="heading-underline mb-4">
+                </div>
+
+                <br>
+
+                <form #workoutForm="ngForm" (ngSubmit)="submitWorkout(workoutForm)" novalidate>
+                   
+                    <div class="mb-3">
+                        <label class="form-label">Workout Name
+                            <span class="text-danger" style="color: red;">*</span>
+                        </label><br>
+                        <input type="text" name="WorkoutName" class="form-control" placeholder="Workout Name" [(ngModel)]="workout.WorkoutName" required #WorkoutName="ngModel">
+                        <div class="form-text text-danger" *ngIf="(workoutForm.submitted || WorkoutName.touched) && !workout.WorkoutName">
+                            *Workout Name is required
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description
+                            <span class="text-danger" style="color: red;">*</span>
+                        </label><br>
+                        <input type="text" name="Description" class="form-control" placeholder="Description" [(ngModel)]="workout.Description" required #Description="ngModel">
+                        <div class="form-text text-danger" *ngIf="(workoutForm.submitted || Description.touched) && !workout.Description">
+                            *Description is required
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="mb-3">
+                        <label class="form-label">Difficulty Level
+                            <span class="text-danger" style="color: red;">*</span>
+                        </label><br>
+                        <input type="number" name="DifficultyLevel" class="form-control" placeholder="Difficulty Level" [(ngModel)]="workout.DifficultyLevel" required  #DifficultyLevel="ngModel">
+                        <div class="form-text text-danger" *ngIf="(workoutForm.submitted || DifficultyLevel.touched) && !workout.DifficultyLevel">
+                            *Difficulty Level is required
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="mb-3">
+                        <label class="form-label">Target Area
+                            <span class="text-danger" style="color: red;">*</span>
+                        </label><br>
+
+                        <select name="TargetArea"  class="form-select" [(ngModel)]="workout.TargetArea" required #TargetArea="ngModel">
+                            <option value="" disabled selected hidden>Select Target Area</option>
+                            <option value="Upper Body">Upper Body</option>
+                            <option value="Lower Body">Lower Body</option>
+                            <option value="Full Body">Full Body</option>
+                        </select> 
+                        <div class="form-text text-danger" *ngIf="(workoutForm.submitted || TargetArea.touched) && !workout.TargetArea">
+                            *Target Area is required
+                        </div>
+                    </div>
+                    <br>
+
+
+                    <div class="mb-3">
+                        <label class="form-label"> Days Per Week
+                            <span class="text-danger" style="color: red;">*</span>
+                        </label><br>
+                        <input type="number" name="DaysPerWeek" class="form-control" placeholder="Days Per Week" [(ngModel)]="workout.DaysPerWeek" required  min="1" max="7" #DaysPerWeek="ngModel">
+                        <div class="form-text text-danger" *ngIf="(workoutForm.submitted || DaysPerWeek.touched) && !workout.DaysPerWeek">
+                            *Days Per Week is required
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="mb-3">
+                        <label class="form-label">Workout Duration (Minutes)
+                            <span class="text-danger" style="color: red;">*</span>
+                        </label><br>
+                        <input type="number" name="AverageWorkoutDurationInMinutes" class="form-control" placeholder="Workout Duration in Minutes" [(ngModel)]="workout.AverageWorkoutDurationInMinutes" required min="1" #AverageWorkoutDurationInMinutes="ngModel">
+                        <div class="form-text text-danger" *ngIf="(workoutForm.submitted || AverageWorkoutDurationInMinutes.touched) && !workout.AverageWorkoutDurationInMinutes">
+                            *Workout Duration is required
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="text-danger mb-2" *ngIf="errorMessage">
+                    {{errorMessage}}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" [disabled]="submitted">Submit</button>
+
+                </form>  
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div *ngIf="showSuccessModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Success</h5>
+        </div>
+        <div class="modal-body text-center py-4">
+          <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+          <p class="mt-2 fs-5">Workout Successfully Added!</p>
+        </div>
+        <div class="modal-footer border-0 justify-content-center">
+          <button type="button" class="btn btn-success px-5" (click)="onSuccessConfirm(workoutForm)">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>

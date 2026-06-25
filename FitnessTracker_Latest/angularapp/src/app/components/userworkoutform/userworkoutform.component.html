@@ -1,0 +1,138 @@
+<div class="container-fluid min-vh-100 d-flex flex-column">
+
+    <div class="row flex-grow-1 justify-content-center align-items-start">
+
+        <div class="col-12 col-md-6 col-lg-6">
+
+            <div class="card shadow-sm mt-4">
+
+                <div class="card-body p-2">
+
+                    <form #workoutForm="ngForm" (ngSubmit)="onSubmit(workoutForm)">
+                        <div class="d-flex justify-content-end px-2 py-2">
+                            <button type="submit" (click)="back()"
+                                class="btn btn-primary text-white text-right">Back</button>
+                        </div>
+                        <h4 class="card-title text-center">Workout Application Form</h4>
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                Age<span class="text-danger">*</span>
+                            </label>
+                            <br>
+                            <input type="text" placeholder="Enter your age" min=1 name="Age"
+                                class="form-control border-0 border-bottom" required [(ngModel)]="workout.Age"
+                                #Age="ngModel" />
+                            <div class="form-text text-danger"
+                                *ngIf="(workoutForm.submitted || Age.touched) && !workout.Age">
+                                *Age is required
+                            </div>
+                        </div>
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                BMI<span class="text-danger">*</span>
+                            </label>
+                            <br>
+                            <input type="text" placeholder="Enter your BMI" name="BMI"
+                                class="form-control border-0 border-bottom" required [(ngModel)]="workout.BMI"
+                                #BMI="ngModel" />
+                            <div class="form-text text-danger"
+                                *ngIf="(workoutForm.submitted || BMI.touched) && !workout.BMI">
+                                *BMI is required
+                            </div>
+                        </div>
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                Gender<span class="text-danger">*</span><br>
+
+                                <select class="form-select" name="Gender" [(ngModel)]="workout.Gender" required
+                                    #Gender="ngModel">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                    <option value="indefinite">Choose not to reveal</option>
+                                </select>
+                                <div class="form-text text-danger"
+                                    *ngIf="(workoutForm.submitted || Gender.touched) && !workout.Gender">
+                                    *Gender is required
+                                </div>
+
+                            </label>
+                        </div>
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                Dietary Preferences<span class="text-danger">*</span><br>
+                                <select class="form-select" name="DietaryPreferences"
+                                    [(ngModel)]="workout.DietaryPreferences" required #DietaryPreferences="ngModel">
+                                    <option value="">Select Dietary Preference</option>
+                                    <option value="Non Vegetarian">Non-Vegetarian</option>
+                                    <option value="Vegetarian">Vegetarian</option>
+                                    <option value="Vegan">Vegan</option>
+                                    <option value="Keto">Keto</option>
+                                    <option value="Soy-Based">Soy-Based(Lactose Intoleratorant)</option>
+                                </select>
+                                <div class="form-text text-danger"
+                                    *ngIf="(workoutForm.submitted || DietaryPreferences.touched) && !workout.DietaryPreferences">
+                                    *Dietary Preference is required
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                Medical History <span class="text-danger">*</span><br>
+                                <select class="form-select" name="MedicalHistory" [(ngModel)]="selectedMedicalHistory"
+                                    required #MedicalHistory="ngModel">
+                                    <option value="">Select Medical History</option>
+                                    <option value="None">None</option>
+                                    <option value="Diabetes">Diabetes</option>
+                                    <option value="Hypertension">Hypertension (High Blood Pressure)</option>
+                                    <option value="HeartDisease">Heart Disease</option>
+                                    <option value="Asthma">Asthma</option>
+                                    <option value="Allergy">Allergies</option>
+                                    <option value="Thyroid">Thyroid Diseases</option>
+                                    <option value="Kidney">Kidney Disease</option>
+                                    <option value="Liver">Liver Disease</option>
+                                    <option value="Cancer">Cancer</option>
+                                    <option value="Epilepsy">Epilepsy</option>
+                                    <option value="Arthritis">Arthritis</option>
+                                    <option value="ChronicPain">Chronic Pain</option>
+                                    <option value="MentalHealth">Mental Health Conditions</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div class="form-text text-danger"
+                                    *ngIf="(workoutForm.submitted || MedicalHistory.touched) && !selectedMedicalHistory">
+                                    *Medical History is required
+                                </div>
+                            </label>
+                        </div>
+                        <div class="justify-content-start mb-3 align-items-start text-start"
+                            *ngIf="selectedMedicalHistory === 'Other'">
+                            <label class="align-items-start px-2">
+                                Please specify your condition <span class="text-danger">*</span><br>
+                                <input type="text" class="form-control" name="MedicalHistoryOther"
+                                    [(ngModel)]="workout.MedicalHistory" required #MedicalHistoryOther="ngModel"
+                                    placeholder="Enter your medical condition" />
+                                <div class="form-text text-danger"
+                                    *ngIf="(workoutForm.submitted || MedicalHistoryOther.touched) && !workout.MedicalHistory.trim()">
+                                    *Please enter your medical condition
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="text-danger mb-2" *ngIf="errorMessage">
+                            {{errorMessage}}
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 mb-3">Submit</button>
+
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,123 @@
+<div class="container-fluid min-vh-100 d-flex flex-column">
+  <div class="row flex-grow-1 justify-content-center align-items-start">
+    <div class="col-12 col-md-6 col-lg-5">
+      <div class="card shadow-sm mt-4">
+        <div class="card-body p-4">
+          
+          <h4 class="text-center fw-semibold mb-3">Edit Workout</h4>
+          <div class="heading-underline mb-4"></div>
+
+          <form *ngIf="workout" #workoutForm="ngForm" (ngSubmit)="editWorkout(workoutForm)" novalidate>
+
+            <div class="mb-3">
+              <label class="form-label">Workout Name <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                name="workoutName"
+                class="form-control"
+                [(ngModel)]="workout.workoutName"
+                required
+                #workoutName="ngModel"
+              />
+              <div class="form-text text-danger" *ngIf="(workoutForm.submitted || workoutName.touched) && workoutName.errors?.['required']">
+                *Workout Name is required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Description <span class="text-danger">*</span></label>
+              <textarea
+                name="description"
+                class="form-control"
+                [(ngModel)]="workout.description"
+                required
+                #description="ngModel"
+              ></textarea>
+              <div class="form-text text-danger" *ngIf="(workoutForm.submitted || description.touched) && description.errors?.['required']">
+                *Description is required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Difficulty Level (1-5) <span class="text-danger">*</span></label>
+              <input
+                type="number"
+                name="difficultyLevel"
+                class="form-control"
+                [(ngModel)]="workout.difficultyLevel"
+                required
+                min="1"
+                max="5"
+                #difficultyLevel="ngModel"
+              />
+              <div class="form-text text-danger" *ngIf="(workoutForm.submitted || difficultyLevel.touched) && difficultyLevel.invalid">
+                *Valid Difficulty Level (1-5) is required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Target Area <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                name="targetArea"
+                class="form-control"
+                [(ngModel)]="workout.targetArea"
+                required
+                #targetArea="ngModel"
+              />
+              <div class="form-text text-danger" *ngIf="(workoutForm.submitted || targetArea.touched) && targetArea.errors?.['required']">
+                *Target Area is required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Days Per Week <span class="text-danger">*</span></label>
+              <input
+                type="number"
+                name="daysPerWeek"
+                class="form-control"
+                [(ngModel)]="workout.daysPerWeek"
+                required
+                min="1"
+                max="7"
+                #daysPerWeek="ngModel"
+              />
+              <div class="form-text text-danger" *ngIf="(workoutForm.submitted || daysPerWeek.touched) && daysPerWeek.invalid">
+                *Days must be between 1 and 7
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Duration (Minutes) <span class="text-danger">*</span></label>
+              <input
+                type="number"
+                name="duration"
+                class="form-control"
+                [(ngModel)]="workout.averageWorkoutDurationInMinutes"
+                required
+                min="1"
+                #duration="ngModel"
+              />
+              <div class="form-text text-danger" *ngIf="(workoutForm.submitted || duration.touched) && duration.invalid">
+                *Duration must be at least 1 minute
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" class="btn btn-success">Update Workout</button>
+            </div>
+
+          </form>
+
+          <div *ngIf="!workout" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Fetching workout data...</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

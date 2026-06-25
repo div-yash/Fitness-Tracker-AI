@@ -1,0 +1,69 @@
+<div class="container-fluid min-vh-100 d-flex flex-column">
+
+    <div class="row flex-grow-1 justify-content-center align-items-start">
+
+        <div class="col-8 col-md-4 col-lg-4">
+
+            <div class="card shadow-sm mt-4">
+
+                <div class="card-body p-2">
+
+                    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
+
+                        <h4 class="card-title text-center">Login</h4>
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                Email<span class="text-danger">*</span>
+                            </label>
+                            <br>
+                            <input type="text" placeholder="Enter your email" name="Email"
+                                class="form-control border-0 border-bottom" required [(ngModel)]="user.Email"
+                                #Email="ngModel" 
+                                pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                [class.is-invalid]="Email.invalid && Email.touched"/>
+                            <div class="form-text text-danger" *ngIf="(loginForm.submitted || Email.touched) && !user.Email">
+                                *Email is required
+                            </div>
+                            <div class="form-text text-danger invalid-feedback"
+                                *ngIf="Email.errors?.['pattern']">
+                                *Please enter a valid email address
+                            </div>
+                        </div>
+                        <div class="justify-content-start mb-3 align-items-start text-start">
+                            <label class="align-items-start px-2">
+                                Password<span class="text-danger">*</span>
+                            </label>
+                            <br>
+                            <input type="password" placeholder="Enter password" name="Password"
+                                class="form-control border-0 border-bottom" required [(ngModel)]="user.Password"
+                                #Password="ngModel"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                                [class.is-invalid]="Password.invalid && Password.touched"/>
+                            <div class="form-text text-danger"
+                                *ngIf="(loginForm.submitted || Password.touched) && !user.Password">
+                                *Password is required
+                            </div>
+                            <div class="form-text text-danger invalid-feedback"
+                            *ngIf="Password.errors?.['pattern']">
+                            *Password should be atleast 8 characters; must contain atleast one uppercase, lowercase, digit and special character
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="loginForm.invalid"
+                            style="background-color: gray; border-color: gray;" [ngStyle]="{'background-color': (loginForm.invalid) ? 'gray' : '#0d6efd',
+                            'border-color': (loginForm.invalid) ? 'gray' : '#0d6efd'}" >
+                            Login</button><br><br>
+
+                        <div class="justify-content-center align-items-center text-center">    
+                            <span>
+                                Don't have an account? 
+                                <a routerLink="/registration" routerLinkActive="router-link-active">
+                                Register Here
+                                </a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

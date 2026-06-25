@@ -1,0 +1,89 @@
+<div class="container py-4">
+    <h2 class="text-center section-title">Workout Requests for Approval</h2>
+
+    <div class="d-flex justify-content-start mb-3">
+        <input type="search" class="form-control search-input" placeholder="Search..." aria-label="Search workouts" />
+    </div>
+
+    <div class="d-flex justify-content-end mb-3">
+        Filter by Status:
+        <select>
+            <option value="all">All</option>
+            <option value="approve">Approved</option>
+            <option value="reject">Rejected</option>
+        </select>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 60px;">S.No</th>
+                    <th scope="col" style="min-width: 220px;">Username</th>
+                    <th scope="col" style="min-width: 140px;">Workout Name</th>
+                    <th scope="col" style="min-width: 140px;">Submission Date</th>
+                    <th scope="col" style="min-width: 120px;">Age</th>
+                    <th scope="col" style="min-width: 120px;">BMI</th>
+                    <th scope="col" style="min-width: 120px;">Gender</th>
+                    <th scope="col" style="min-width: 150px;">Dietary Preferences</th>
+                    <th scope="col" style="min-width: 150px;">Medical History</th>
+                    <th scope="col" style="min-width: 120px;">Status</th>
+                    <th scope="col" style="min-width: 140px;">Action</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+                <tr *ngFor="let item of workoutRequestList; let i = index">
+                    <td>{{ i + 1 }}</td> <!-- S.No starts at 1 -->
+                    <td>{{ item.user?.username }}</td> <!-- Username -->
+
+                    <td>{{ item.workout?.workoutName }}</td> <!-- Workout Name -->
+
+                    <td>{{ item.requestedDate | date: 'yyyy-MM-dd' }}</td> <!-- Submission Date -->
+
+                    <td>{{ item.age }}</td>
+                    <td>{{ item.bmi }}</td>
+                    <td>{{ item.gender }}</td>
+                    <td>{{ item.dietaryPreferences }}</td>
+                    <td>{{ item.medicalHistory }}</td>
+
+                    <td>
+                        <span class="badge" [ngClass]="{'bg-secondary': item.requestStatus === 'Pending',
+                        'bg-success': item.requestStatus === 'Approved','bg-danger': item.requestStatus === 'Rejected'}">
+                            {{ item.requestStatus }}
+                    </span>
+                    </td>
+
+                    <td>
+                        <button (click)="onView(item)" class="btn btn-info btn-sm">View</button>
+                        <button (click)="onApprove(item)" class="btn btn-success btn-sm">Approve</button>
+                        <button (click)="onReject(item)" class="btn btn-warning btn-sm">Reject</button>
+                    </td>
+                </tr>
+
+                <tr *ngIf="!workoutRequestList || workoutRequestList.length === 0">
+                    <td colspan="11" class="empty-state">
+                        Oops! No records found
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+<div class="modal-backdrop" *ngIf="showModal"></div>
+
+<div class="modal-box" *ngIf="showModal">
+  <div class="modal-header">
+    <h5>Workout Details</h5>
+    <button class="close-btn" (click)="closeModal()">×</button>
+  </div>
+
+  <div class="modal-body">
+    <p><strong>Description:</strong> {{ selectedItem?.workout?.description }}</p>
+    <p><strong>Target Area:</strong> {{ selectedItem?.workout?.targetArea }}</p>
+    <p><strong>Duration:</strong> {{ selectedItem?.workout?.averageWorkoutDurationInMinutes }} mins</p>
+</div>

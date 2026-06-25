@@ -1,0 +1,70 @@
+<div class="page">
+    <h2 class="title text-center">Workouts</h2>
+    <hr class="title-underline" />
+
+    <div class="search-row">
+
+        <input type="text" class="search-input" placeholder="Search by Workout Name or Description..."
+            [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" />
+
+    </div>
+
+    <div *ngIf="loading" class="state">Loading...</div>
+    <div *ngIf="!loading && serverError" class="state error">{{ serverError }}</div>
+    <div *ngIf="!loading && !serverError && filtered.length === 0" class="state">No workouts found.</div>
+
+    <div class="table-wrap" *ngIf="!loading && !serverError && filtered.length > 0">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">S.No</th>
+                    <th>Workout Name</th>
+                    <th>Description</th>
+                    <th style="width: 140px;">Difficulty Level</th>
+                    <th style="width: 140px;">Target Area</th>
+                    <th style="width: 130px;">Days Per Week</th>
+                    <th style="width: 120px;">Duration</th>
+                    <th style="width: 180px;">Created At</th>
+                    <th style="width: 150px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let workout of filtered; let i = index;">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ workout.workoutName }}</td>
+                    <td>{{ workout.description }}</td>
+                    <td>{{ workout.difficultyLevel }}</td>
+                    <td>{{ workout.targetArea }}</td>
+                    <td>{{ workout.daysPerWeek }}</td>
+                    <td>{{ workout.averageWorkoutDurationInMinutes }} mins</td>
+                    <td>{{ workout.createdAt | date:'MMM d, y' }}</td>
+
+                    <td class="actions">
+                        <button type="button" class="btn btn-edit"
+                            (click)="editWorkout(workout.workoutId)">Edit</button>
+                        <button type="button" class="btn btn-delete"
+                            (click)="confirmDelete(workout.workoutId)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div *ngIf="showDeleteModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Confirmation</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this workout?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="onConfirmDelete()">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>

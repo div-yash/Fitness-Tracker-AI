@@ -1,0 +1,46 @@
+# Dependency directories
+node_modules/
+.angular/
+dist/
+
+# IDE / Editor configuration
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Python virtual environment & cache
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# .NET output
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Environmental variables & logs
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.log
+systemlogs.log
+Logs/
+
+# OS metadata
+.DS_Store
+Thumbs.db

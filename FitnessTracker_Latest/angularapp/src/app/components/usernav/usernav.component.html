@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-lg py-2" style="background: linear-gradient(to right, #2c2f3c, #4b4fa5);">
+  <div class="container-fluid">
+
+    <a class="navbar-brand text-white m-0 fw-semibold">FITNESS-TRACKER</a>
+
+    <div class="ms-auto d-flex align-items-center gap-3">
+
+      <!-- <span class="badge border text-white px-2 py-1 rounded-2"
+        style="font-size: 15px; border-color: rgba(255,255,255,0.9);">
+        {{ roleLabel }}
+      </span> -->
+
+      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        #home="routerLinkActive" class="nav-link" [ngClass]="home.isActive ? 'home-active' : 'home-default'">
+        Home
+      </a>
+
+      <a routerLink="/userviewworkout" routerLinkActive="active" #work="routerLinkActive" class="nav-link"
+        [ngClass]="work.isActive ? 'home-active' : 'home-default'">
+        Workout
+      </a>
+
+      <a routerLink="/userappliedworkout" routerLinkActive="active" class="nav-link text-white fw-medium"
+        style="text-decoration: none;">
+        Applied WorkoutRequest
+      </a>
+
+      <a routerLink="/symptomchecker" routerLinkActive="active" class="nav-link text-white fw-medium"
+        style="text-decoration: none;">
+        Symptom Checker
+      </a>
+
+      <div class="nav-item dropdown position-relative hover-dropdown">
+        <a class="nav-link text-white dropdown-toggle pe-none" role="button">Feedbacks</a>
+        <ul class="dropdown-menu shadow border-0 rounded-3 mt-1 py-1 custom-dropdown">
+          <li><a class="dropdown-item py-2" routerLink="/useraddfeedback">Add Feedback</a></li>
+          <li><a class="dropdown-item py-2" routerLink="/userviewfeedback">View Feedback</a></li>
+        </ul>
+      </div>
+
+      <a routerLink="/home" (click)="onLogout()" class="btn btn-danger"
+        style="border: 2px solid red; padding: 6px 14px; color: red; background: white; border-radius: 6px;">
+        Logout
+      </a>
+
+    </div>
+  </div>
+</nav>

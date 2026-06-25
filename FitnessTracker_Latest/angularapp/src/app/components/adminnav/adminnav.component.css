@@ -1,0 +1,29 @@
+.navbar-custom {
+  background: linear-gradient(to right, #3a3a3a, #5a5a8a);
+  padding: 10px;
+}
+
+/* Custom Dropdown Styling to match your 0 8px 20px shadow */
+.custom-dropdown-menu {
+  min-width: 180px;
+  margin-top: 6px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: none;
+  border-radius: 6px;
+}
+
+/* Hover logic for the dropdown */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu {
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: all 140ms ease;
+}

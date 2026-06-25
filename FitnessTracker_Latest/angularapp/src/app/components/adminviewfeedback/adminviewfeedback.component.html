@@ -1,0 +1,41 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Feedback Details</h2>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        {{errorMessage}}
+    </div>
+
+    <div *ngIf="isLoading" class="text-center my-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Fetching feedbacks...</p>
+    </div>
+
+    <table class="table table-bordered table-striped" *ngIf="!isLoading && feedbackList.length > 0">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>User ID</th>
+                <th>Feedback</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let feedback of feedbackList; let i=index">
+                <td>{{i+1}}</td>
+                <td>{{feedback.userId}}</td>
+                <td>{{feedback.feedbackText}}</td>
+                <td>{{feedback.date | date:'mediumDate'}}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" (click)="deleteFeedback(feedback.feedbackId)">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && feedbackList.length === 0 && !errorMessage" class="alert alert-info text-center">
+        No feedback available
+    </div>
+</div>

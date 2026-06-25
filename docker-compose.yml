@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fitnesstracker-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=SecurePassword123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  backend-api:
+    build:
+      context: ./FitnessTracker_Latest/dotnetapp
+      dockerfile: Dockerfile
+    container_name: fitnesstracker-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_CONNECTION_STRING=Server=database;Database=FitnessTrackerDb;User Id=sa;Password=SecurePassword123!;TrustServerCertificate=True;MultipleActiveResultSets=true;
+      - JWT_KEY=bdndfnbfjknvdfvjnvnsdkjnsdclnsdcbcsdcbsj
+    depends_on:
+      - database
+
+  ml-service:
+    build:
+      context: ./Medicine-Recommendation-and-Disease-Prediction-using-Random-Forest
+      dockerfile: Dockerfile
+    container_name: fitnesstracker-ml
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./FitnessTracker_Latest/angularapp
+      dockerfile: Dockerfile
+    container_name: fitnesstracker-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend-api
+      - ml-service
+
+volumes:
+  mssql-data:

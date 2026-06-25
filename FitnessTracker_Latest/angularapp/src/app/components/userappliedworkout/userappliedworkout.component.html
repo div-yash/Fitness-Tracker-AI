@@ -1,0 +1,64 @@
+<div class="container mt-4">
+
+    <h3 class="text-primary mb-3">My Applied Workouts</h3>
+  
+    <div *ngIf="message" class="alert alert-info">{{ message }}</div>
+  
+    <div *ngIf="loading" class="text-center mb-3">
+      <div class="spinner-border text-primary"></div>
+    </div>
+  
+    <table *ngIf="!loading && appliedList.length > 0"
+           class="table table-bordered table-striped">
+  
+      <thead class="table-dark">
+        <tr>
+          <th>Request ID</th>
+          <th>Workout Name</th>
+          <th>Age</th>
+          <th>BMI</th>
+          <th>Gender</th>
+          <th>Diet</th>
+          <th>Medical History</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+  
+      <tbody>
+        <tr *ngFor="let item of appliedList">
+  
+          <td>{{ item.workoutRequestId }}</td>
+          <td>{{ item.workoutName }}</td>
+          <td>{{ item.age }}</td>
+          <td>{{ item.bmi }}</td>
+          <td>{{ item.gender }}</td>
+          <td>{{ item.dietaryPreferences }}</td>
+          <td>{{ item.medicalHistory }}</td>
+          <td>{{ item.requestedDate | date:'mediumDate' }}</td>
+  
+          <td>
+            <span class="badge"
+                  [ngClass]="{
+                    'bg-warning text-dark': item.requestStatus === 'Pending',
+                    'bg-success': item.requestStatus === 'Approved',
+                    'bg-danger': item.requestStatus === 'Rejected'
+                  }">
+              {{ item.requestStatus }}
+            </span>
+          </td>
+  
+          <td>
+            <button class="btn btn-sm btn-danger"
+                    (click)="deleteApplication(item.workoutRequestId)">
+              Delete
+            </button>
+          </td>
+  
+        </tr>
+      </tbody>
+  
+    </table>
+  </div>
+  

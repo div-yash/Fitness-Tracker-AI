@@ -1,0 +1,124 @@
+<div class="container-fluid min-vh-100 d-flex flex-column">
+  <div class="row flex-grow-1 justify-content-center align-items-start">
+    <div class="col-12 col-md-6 col-lg-6">
+      <div class="card shadow-sm mt-4">
+        <div class="card-body p-3">
+
+          <form #userForm="ngForm" (ngSubmit)="register(userForm)" novalidate>
+
+            <h4 class="card-title text-center mb-3">Registration</h4>
+
+            <div class="mb-3 text-start">
+              <label class="form-label px-2">Username <span class="text-danger">*</span></label>
+              <input type="text" name="Username" class="form-control border-0 border-bottom" required
+                [(ngModel)]="user.Username" #Username="ngModel"
+                [class.is-invalid]="(Username.invalid && (Username.touched || userForm.submitted))" />
+              <div class="invalid-feedback d-block"
+                *ngIf="(Username.touched || userForm.submitted) && Username.errors?.['required']">
+                Username is required
+              </div>
+            </div>
+
+            <div class="mb-3 text-start">
+              <label class="form-label px-2">Email <span class="text-danger">*</span></label>
+              <input type="email" name="Email" class="form-control border-0 border-bottom" required email
+                [(ngModel)]="user.Email" #Email="ngModel"
+                [class.is-invalid]="(Email.invalid && (Email.touched || userForm.submitted))" />
+              <div class="invalid-feedback d-block"
+                *ngIf="(Email.touched || userForm.submitted) && Email.errors?.['required']">
+                Email is required
+              </div>
+              <div class="invalid-feedback d-block"
+                *ngIf="(Email.touched || userForm.submitted) && Email.errors?.['email']">
+                Please enter a valid email address
+              </div>
+            </div>
+
+            <div class="mb-3 text-start">
+              <label class="form-label px-2">Password <span class="text-danger">*</span></label>
+              <input type="password" name="Password" class="form-control border-0 border-bottom" required minlength="8"
+                [pattern]="passwordPattern" autocomplete="new-password" [(ngModel)]="user.Password" #Password="ngModel"
+                [class.is-invalid]="
+                    (Password.invalid && (Password.touched || userForm.submitted))
+                  " />
+              <div class="invalid-feedback d-block"
+                *ngIf="(Password.touched || userForm.submitted) && Password.errors?.['required']">
+                Password is required
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="
+                       (Password.touched || userForm.submitted) &&
+                       (Password.errors?.['minlength'] || Password.errors?.['pattern'])
+                     ">
+                Password must be at least 8 characters and include one uppercase letter,
+                one lowercase letter, one number, and one special character.
+              </div>
+            </div>
+
+            <div class="mb-3 text-start">
+              <label class="form-label px-2">Confirm Password <span class="text-danger">*</span></label>
+              <input type="password" name="ConfirmPassword" class="form-control border-0 border-bottom" required
+                autocomplete="new-password" [(ngModel)]="user.ConfirmPassword" #ConfirmPassword="ngModel"
+                [class.is-invalid]="
+                    (ConfirmPassword.touched || userForm.submitted) &&
+                    (
+                      ConfirmPassword.errors?.['required'] ||
+                      (user.Password && user.ConfirmPassword && user.Password !== user.ConfirmPassword)
+                    )
+                  " />
+              <div class="invalid-feedback d-block"
+                *ngIf="(ConfirmPassword.touched || userForm.submitted) && ConfirmPassword.errors?.['required']">
+                Confirm Password is required
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="
+                       (ConfirmPassword.touched || userForm.submitted) &&
+                       user.Password && user.ConfirmPassword &&
+                       (user.Password !== user.ConfirmPassword)
+                     ">
+                Passwords do not match
+              </div>
+            </div>
+
+            <div class="mb-3 text-start">
+              <label class="form-label px-2">Mobile Number <span class="text-danger">*</span></label>
+              <input type="" name="MobileNumber" class="form-control border-0 border-bottom" required
+                pattern="^[0-9]{10}$" maxlength="10" [(ngModel)]="user.MobileNumber" #MobileNumber="ngModel"
+                [class.is-invalid]="(MobileNumber.invalid && (MobileNumber.touched || userForm.submitted))" />
+
+              <div class="invalid-feedback d-block"
+                *ngIf="(MobileNumber.touched || userForm.submitted) && MobileNumber.errors?.['required']">
+                Mobile Number is required
+              </div>
+
+              <div class="invalid-feedback d-block"
+                *ngIf="(MobileNumber.touched || userForm.submitted) && MobileNumber.errors?.['pattern']">
+                Enter a valid 10 digit mobile number
+              </div>
+            </div>
+
+            <div class="mb-3 text-start">
+              <label class="form-label px-2">Role <span class="text-danger">*</span></label>
+              <select class="form-select border-0 border-bottom" name="UserRole" required [(ngModel)]="user.UserRole"
+                #UserRole="ngModel" [class.is-invalid]="(UserRole.invalid && (UserRole.touched || userForm.submitted))">
+                <option value="">Select Role</option>
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+              </select>
+              <div class="invalid-feedback d-block"
+                *ngIf="(UserRole.touched || userForm.submitted) && UserRole.errors?.['required']">
+                Role is required
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3"
+              [disabled]="!userForm.valid || user.Password !== user.ConfirmPassword" [ngStyle]="{
+                  'background-color': (!userForm.valid || user.Password !== user.ConfirmPassword) ? 'gray' : '#0d6efd',
+                  'border-color': (!userForm.valid || user.Password !== user.ConfirmPassword) ? 'gray' : '#0d6efd'
+                }">
+              Register
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

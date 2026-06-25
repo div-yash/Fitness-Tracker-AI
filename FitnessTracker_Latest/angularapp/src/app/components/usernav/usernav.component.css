@@ -1,0 +1,50 @@
+
+/* Active vs default styles for Home link */
+.home-active {
+  background-color: #a06ad9 !important;
+  color: #fff !important;
+  padding: 4px 14px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  display: inline-block;
+}
+
+.home-default {
+  background-color: transparent !important;
+  color: #fff !important;
+  padding: 6px 14px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  border: 1px solid transparent !important;
+  display: inline-block;
+}
+
+/* Hover dropdown (pure CSS; no JS required) */
+.hover-dropdown .dropdown-menu {
+  display: block;              /* Needed for transition visibility control */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  transition: opacity .15s ease, transform .15s ease, visibility .15s;
+  min-width: 160px;
+}
+
+.hover-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown item aesthetics to match your original */
+.custom-dropdown .dropdown-item {
+  color: #333;
+  border-radius: .375rem; /* 6px */
+  margin: 2px 6px;        /* slight spacing */
+}
+
+.custom-dropdown .dropdown-item:hover {
+  background-color: #f2f2f7;
+}

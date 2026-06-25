@@ -1,0 +1,100 @@
+
+.page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  
+  .title {
+    margin: 12px 0 6px;
+    font-weight: 600;
+  }
+  
+  .title-underline {
+    margin: 0 0 16px 0;
+    border: 0;
+    height: 2px;
+    background: #0d6efd;
+    width: 120px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .search-row {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .search-input {
+    max-width: 360px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+  }
+  
+  .state {
+    padding: 10px 0;
+    text-align: center;
+  }
+  
+  .state.error {
+    color: #b21616;
+  }
+  
+  .table-wrap {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  .table thead th {
+    background: #f7f7f7;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+  
+  .actions {
+    white-space: nowrap;
+  }
+  
+  .btn {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  
+  .btn-edit {
+    background-color: #28a745; /* green */
+  }
+  
+  .btn-edit:hover {
+    background-color: #218838;
+  }
+  
+  .btn-delete {
+    background-color: #dc3545; /* red */
+  }
+  
+  .btn-delete:hover {
+    background-color: #c82333;
+  }
+  

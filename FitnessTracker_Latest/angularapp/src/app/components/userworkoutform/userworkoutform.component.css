@@ -1,0 +1,14 @@
+.heading-underline{
+    height: 3px;
+    background: #0d6efd;
+    border-radius: 2px;
+}
+.card{
+    border-radius: .5rem;
+}
+ 
+@media (max-width: 576px){
+    .card-body{
+        padding: 1 rem !important;
+    }
+}

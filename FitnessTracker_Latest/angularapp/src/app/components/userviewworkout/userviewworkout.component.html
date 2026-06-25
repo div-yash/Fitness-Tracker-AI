@@ -1,0 +1,61 @@
+<div class="container py-4">
+  <h2 class="text-center section-title">Available Workouts</h2>
+
+  <div class="d-flex justify-content-start mb-3">
+    <input
+      type="search"
+      class="form-control search-input"
+      placeholder="Search..."
+      aria-label="Search workouts"
+      [(ngModel)]="searchTerm"
+      name="searchTerm"
+    />
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle">
+      <thead>
+        <tr>
+          <th scope="col" style="width: 60px;">S.No</th>
+          <th scope="col">Workout Name</th>
+          <th scope="col" style="min-width: 220px;">Description</th>
+          <th scope="col" style="min-width: 140px;">Difficulty Level</th>
+          <th scope="col" style="min-width: 140px;">Target Area</th>
+          <th scope="col" style="min-width: 120px;">Days Per Week</th>
+          <th scope="col" style="min-width: 120px;">Duration</th>
+          <th scope="col" style="min-width: 150px;">Created At</th>
+          <th scope="col" style="min-width: 140px;">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of filteredWorkouts; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.workoutName }}</td>
+          <td>{{ item.description }}</td>
+          <td>{{ item.difficultyLevel }}</td>
+          <td>{{ item.targetArea }}</td>
+          <td>{{ item.daysPerWeek }}</td>
+          <td>{{ item.averageWorkoutDurationInMinutes }} mins</td>
+          <td>{{ item.createdAt | date: 'MMM d, y' }}</td>
+          <td>
+            <button
+              class="btn"
+              [ngClass]="isApplied(item.workoutId) ? 'btn-secondary' : 'btn-success'"
+              [disabled]="isApplied(item.workoutId)"
+              (click)="onApply(item.workoutId)">
+
+              {{ isApplied(item.workoutId) ? 'Applied' : 'Apply' }}
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="filteredWorkouts.length === 0">
+          <td colspan="9" class="empty-state">
+            Oops! No records found
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
