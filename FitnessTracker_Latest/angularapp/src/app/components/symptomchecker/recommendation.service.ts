@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { config } from '../../config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecommendationService {
-  private flaskUrl = 'http://localhost:5000/api/predict';
+  private flaskUrl = config.mlUrl;
 
   constructor(private http: HttpClient) {}
 

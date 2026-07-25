@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
 import { Login } from '../models/login.model';
+import { config } from '../config';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,7 @@ export class AuthService {
    constructor(private http:HttpClient) { 
   }
   
-  public apiUrl = (window.location.origin.includes('examly.io') || window.location.pathname.includes('/proxy/'))
-    ? `${window.location.origin}/proxy/8080`
-    : 'http://localhost:8080';
+  public apiUrl = config.apiUrl;
 
   register(newUser: User): Observable<User>{
     return this.http.post<User>(`${this.apiUrl}/api/register`, newUser).pipe(tap(data => {

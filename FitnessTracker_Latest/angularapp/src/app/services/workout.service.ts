@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Workout } from '../models/workout.model';
 import { WorkoutRequest } from '../models/workoutrequest.model';
+import { config } from '../config';
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +11,7 @@ import { WorkoutRequest } from '../models/workoutrequest.model';
 
 export class WorkoutService {
   
-  public apiUrl = (window.location.origin.includes('examly.io') || window.location.pathname.includes('/proxy/'))
-    ? `${window.location.origin}/proxy/8080`
-    : 'http://localhost:8080';
+  public apiUrl = config.apiUrl;
 
   constructor(private http:HttpClient) { }
 
