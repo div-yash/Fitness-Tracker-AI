@@ -36,7 +36,32 @@ builder.Services.AddCors(options => {
 
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? "Server=(localdb)\\mssqllocaldb;Database=FitnessTrackerDb;Trusted_Connection=True;MultipleActiveResultSets=true";
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+// Helper to convert postgres:// URI to connection string if needed
+if (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://"))
+{
+    var databaseUri = new Uri(connectionString);
+    var userInfo = databaseUri.UserInfo.Split(':');
+    var user = userInfo[0];
+    var password = userInfo.Length > 1 ? userInfo[1] : "";
+    var host = databaseUri.Host;
+    var port = databaseUri.Port == -1 ? 5432 : databaseUri.Port;
+    var database = databaseUri.LocalPath.TrimStart('/');
+    
+    connectionString = $"Host={host};Port={port};Database={database};Username={user};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
+}
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    if (connectionString.Contains("Host=") || connectionString.Contains("Port=") || connectionString.Contains("sslmode="))
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlServer(connectionString);
+    }
+});
 
 
 builder.Services
