@@ -15,4 +15,5 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 EXPOSE 8080
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
 ENTRYPOINT ["dotnet", "dotnetapp.dll"]
