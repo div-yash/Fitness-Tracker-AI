@@ -1,11 +1,4 @@
-angularapp/angular.json
-angularapp/.editorconfig
-angularapp/karma.conf.js
-angularapp/tsconfig.app.json
-angularapp/tsconfig.json
-angularapp/tsconfig.spec.json
 angularapp/node_modules
-angularapp/package-lock.json
 dotnetapp/Migrations
 angularapp/node_modules
 dotnetapp/.config
