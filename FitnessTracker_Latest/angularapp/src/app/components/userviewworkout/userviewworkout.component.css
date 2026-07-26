@@ -1,32 +1,241 @@
-.section-title {
-    font-weight: 700;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: .5rem;
-    margin-bottom: 1rem;
-  }
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
-  
-  .table thead th {
-    background-color: #1e6a8d; 
-    color: #fff;
-    white-space: nowrap;
-    vertical-align: middle;
-  }
+.title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
 
+.workouts-count {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+}
 
-  .search-input {
-    max-width: 420px;
-  }
+.title-underline {
+  height: 2px;
+  background: #0d6efd;
+  width: 120px;
+  margin: 16px auto 28px auto;
+  border-radius: 2px;
+}
 
+/* Search Bar with Search Icon inside */
+.search-container {
+  display: flex;
+  align-items: center;
+}
 
-  .empty-state {
-    text-align: center;
-    color: #6c757d;
-    padding: 1rem 0;
-  }
+.search-icon {
+  position: absolute;
+  left: 16px;
+  color: #64748b;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
 
-  
-  .table .btn {
-    padding: .25rem .5rem;
-    font-size: .875rem;
-  }
+.search-input {
+  background-color: #17202d !important;
+  border: 1px solid #1e293b !important;
+  color: #ffffff !important;
+  border-radius: 8px;
+  padding: 10px 16px 10px 44px !important;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.search-input::placeholder {
+  color: #475569 !important;
+}
+
+.search-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+.rows-dropdown {
+  background-color: #17202d !important;
+  border: 1px solid #1e293b !important;
+  color: #ffffff !important;
+  border-radius: 6px;
+  padding: 6px 30px 6px 12px !important;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.rows-dropdown:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: none !important;
+}
+
+/* Table Style Overrides */
+.table-wrap {
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background-color: #0e1626;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table thead th {
+  background-color: #131924 !important;
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 14px 16px;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+.table thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.table thead th.sortable:hover {
+  color: #ffffff !important;
+  background-color: #17202d !important;
+}
+
+.table thead th i {
+  font-size: 0.75rem;
+  margin-left: 4px;
+  color: #64748b;
+}
+
+.table tbody td {
+  padding: 14px 16px;
+  color: #cbd5e1;
+  border-bottom: 1px solid #1e293b !important;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.015) !important;
+}
+
+.workout-name-cell {
+  font-weight: 600;
+  color: #ffffff !important;
+}
+
+.description-cell {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #94a3b8 !important;
+}
+
+/* Badging system matching mockup */
+.difficulty-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.badge-beginner {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.badge-intermediate {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #3b82f6 !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+.badge-expert {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Action Buttons (Apply / Applied) */
+.btn-action-pill {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-apply {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+  border: 1px solid rgba(40, 167, 69, 0.3) !important;
+  color: #28a745 !important;
+}
+
+.btn-apply:hover {
+  background-color: #28a745 !important;
+  color: #ffffff !important;
+}
+
+.btn-applied {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #64748b !important;
+  cursor: not-allowed !important;
+}
+
+/* Pagination Override */
+.pagination {
+  gap: 4px;
+}
+
+.page-link {
+  background-color: #17202d !important;
+  border: 1px solid #1e293b !important;
+  color: #cbd5e1 !important;
+  padding: 6px 12px;
+  border-radius: 6px !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.page-link:hover {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+}
+
+.page-item.active .page-link {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+.page-item.disabled .page-link {
+  background-color: #0e1626 !important;
+  border-color: #1e293b !important;
+  color: #475569 !important;
+  cursor: not-allowed;
+}
+
+.state {
+  font-size: 1.1rem;
+}

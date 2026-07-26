@@ -1,61 +1,143 @@
-<div class="container py-4">
-  <h2 class="text-center section-title">Available Workouts</h2>
+<div class="page py-4">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h2 class="title d-inline-block position-relative">
+            Available Workouts
+            <span class="workouts-count">{{ filteredWorkouts.length }} workouts</span>
+        </h2>
+        <div class="title-underline"></div>
+    </div>
 
-  <div class="d-flex justify-content-start mb-3">
-    <input
-      type="search"
-      class="form-control search-input"
-      placeholder="Search..."
-      aria-label="Search workouts"
-      [(ngModel)]="searchTerm"
-      name="searchTerm"
-    />
-  </div>
+    <!-- Search & Row Configuration Bar -->
+    <div class="search-row d-flex justify-content-between align-items-center flex-wrap mb-4 gap-3">
+        <div class="search-container position-relative flex-grow-1" style="max-width: 380px;">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" class="search-input ps-5" placeholder="Search by Workout Name, Difficulty, or Target Area..."
+                [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+        </div>
+        
+        <div class="rows-selector d-flex align-items-center gap-2">
+            <span class="text-secondary small font-weight-bold">Rows:</span>
+            <select class="form-select rows-dropdown" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                <option [ngValue]="5">5</option>
+                <option [ngValue]="10">10</option>
+                <option [ngValue]="20">20</option>
+                <option [ngValue]="50">50</option>
+            </select>
+        </div>
+    </div>
 
-  <div class="table-responsive">
-    <table class="table table-bordered align-middle">
-      <thead>
-        <tr>
-          <th scope="col" style="width: 60px;">S.No</th>
-          <th scope="col">Workout Name</th>
-          <th scope="col" style="min-width: 220px;">Description</th>
-          <th scope="col" style="min-width: 140px;">Difficulty Level</th>
-          <th scope="col" style="min-width: 140px;">Target Area</th>
-          <th scope="col" style="min-width: 120px;">Days Per Week</th>
-          <th scope="col" style="min-width: 120px;">Duration</th>
-          <th scope="col" style="min-width: 150px;">Created At</th>
-          <th scope="col" style="min-width: 140px;">Action</th>
-        </tr>
-      </thead>
+    <!-- States handling -->
+    <div *ngIf="loading" class="state py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <div class="mt-2 text-secondary">Loading workouts...</div>
+    </div>
+    <div *ngIf="!loading && serverError" class="state error py-5">
+        <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+        <div class="mt-2">{{ serverError }}</div>
+    </div>
+    <div *ngIf="!loading && !serverError && filteredWorkouts.length === 0" class="state py-5 text-muted">
+        <i class="bi bi-info-circle fs-3"></i>
+        <div class="mt-2">No workouts found.</div>
+    </div>
 
-      <tbody>
-        <tr *ngFor="let item of filteredWorkouts; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ item.workoutName }}</td>
-          <td>{{ item.description }}</td>
-          <td>{{ item.difficultyLevel }}</td>
-          <td>{{ item.targetArea }}</td>
-          <td>{{ item.daysPerWeek }}</td>
-          <td>{{ item.averageWorkoutDurationInMinutes }} mins</td>
-          <td>{{ item.createdAt | date: 'MMM d, y' }}</td>
-          <td>
-            <button
-              class="btn"
-              [ngClass]="isApplied(item.workoutId) ? 'btn-secondary' : 'btn-success'"
-              [disabled]="isApplied(item.workoutId)"
-              (click)="onApply(item.workoutId)">
+    <!-- Table Layout -->
+    <div class="table-wrap" *ngIf="!loading && !serverError && filteredWorkouts.length > 0">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">#</th>
+                    <th class="sortable" (click)="setSort('WorkoutName')">
+                        Workout Name 
+                        <i class="bi" [ngClass]="sortColumn === 'WorkoutName' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                    </th>
+                    <th>Description</th>
+                    <th class="sortable" (click)="setSort('DifficultyLevel')" style="width: 150px;">
+                        Difficulty 
+                        <i class="bi" [ngClass]="sortColumn === 'DifficultyLevel' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                    </th>
+                    <th class="sortable" (click)="setSort('TargetArea')" style="width: 150px;">
+                        Target Area 
+                        <i class="bi" [ngClass]="sortColumn === 'TargetArea' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                    </th>
+                    <th class="sortable" (click)="setSort('DaysPerWeek')" style="width: 140px;">
+                        Days / Week 
+                        <i class="bi" [ngClass]="sortColumn === 'DaysPerWeek' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                    </th>
+                    <th class="sortable" (click)="setSort('AverageWorkoutDurationInMinutes')" style="width: 150px;">
+                        Duration (Min) 
+                        <i class="bi" [ngClass]="sortColumn === 'AverageWorkoutDurationInMinutes' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                    </th>
+                    <th class="sortable" (click)="setSort('CreatedAt')" style="width: 160px;">
+                        Created 
+                        <i class="bi" [ngClass]="sortColumn === 'CreatedAt' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                    </th>
+                    <th style="width: 150px; text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of paginatedWorkouts; let i = index;">
+                    <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                    <td class="workout-name-cell">{{ item.WorkoutName }}</td>
+                    <td class="description-cell">{{ item.Description }}</td>
+                    <td>
+                        <span class="difficulty-badge" [ngClass]="getDifficultyClass(item.DifficultyLevel)">
+                            {{ getDifficultyLabel(item.DifficultyLevel) }}
+                        </span>
+                    </td>
+                    <td>{{ item.TargetArea }}</td>
+                    <td>{{ item.DaysPerWeek }}x</td>
+                    <td>{{ item.AverageWorkoutDurationInMinutes }}</td>
+                    <td>{{ item.CreatedAt | date:'MMM d, y' }}</td>
+                    <td class="text-center">
+                        <button
+                            class="btn btn-action-pill"
+                            [ngClass]="isApplied(item.WorkoutId) ? 'btn-applied' : 'btn-apply'"
+                            [disabled]="isApplied(item.WorkoutId)"
+                            (click)="onApply(item.WorkoutId)">
+                            <i class="bi" [ngClass]="isApplied(item.WorkoutId) ? 'bi-check-circle-fill me-1' : 'bi-plus-circle-fill me-1'"></i>
+                            {{ isApplied(item.WorkoutId) ? 'Applied' : 'Apply' }}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-              {{ isApplied(item.workoutId) ? 'Applied' : 'Apply' }}
-            </button>
-          </td>
-        </tr>
+        <!-- Table Footer: Pagination -->
+        <div class="table-footer d-flex justify-content-between align-items-center flex-wrap p-3 border-top border-secondary">
+            <div class="footer-info text-secondary small">
+                Showing {{ (currentPage - 1) * pageSize + 1 }}–{{ Math.min(currentPage * pageSize, filteredWorkouts.length) }} of {{ filteredWorkouts.length }} results
+            </div>
+            
+            <nav *ngIf="totalPages > 1">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                        <button class="page-link" (click)="setPage(1)">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </button>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                        <button class="page-link" (click)="setPage(currentPage - 1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                    </li>
+                    
+                    <li class="page-item" *ngFor="let p of pageNumbers" [class.active]="currentPage === p">
+                        <button class="page-link" (click)="setPage(p)">{{ p }}</button>
+                    </li>
 
-        <tr *ngIf="filteredWorkouts.length === 0">
-          <td colspan="9" class="empty-state">
-            Oops! No records found
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                        <button class="page-link" (click)="setPage(currentPage + 1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                        <button class="page-link" (click)="setPage(totalPages)">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
