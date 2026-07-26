@@ -1,7 +1,7 @@
 export const config = {
   // Replace these with your actual deployed Render backend and ML URLs
-  productionApiUrl: 'https://fitnesstracker-backend-api.onrender.com',
-  productionMlUrl: 'https://fitnesstracker-ml-service.onrender.com',
+  productionApiUrl: 'https://fitnesstracker-backend-ijcv.onrender.com',
+  productionMlUrl: 'https://fitness-tracker-ai-97qn.onrender.com',
 
   get apiUrl(): string {
     if (window.location.origin.includes('examly.io') || window.location.pathname.includes('/proxy/')) {
