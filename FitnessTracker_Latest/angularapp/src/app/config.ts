@@ -1,5 +1,5 @@
 export const config = {
-  // Replace these with your actual deployed Render backend and ML URLs
+  // Deployed Render backend and ML URLs
   productionApiUrl: 'https://fitnesstracker-backend-ijcv.onrender.com',
   productionMlUrl: 'https://fitness-tracker-ai-97qn.onrender.com',
 
