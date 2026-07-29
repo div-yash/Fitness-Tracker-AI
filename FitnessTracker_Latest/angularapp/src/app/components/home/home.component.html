@@ -1,29 +1,117 @@
-<div class="container mt-5">
-     <div class="text-center mb-4">
-          <h1 class="fw-bold">Fitness-Tracker</h1>
-     </div>
-     <div class="row justify-content-center">
-          <div class="col-md-10 col-lg-8">
-               <div class="card shadow-sm">
-                    <div class="card-body">
-                         <p class="card-text text-muted text-center">
-                              Fitness-Tracker is a comprehensive digital platform designed
-                              for individuals committed to <br>
-                              achieving their fitness goals.
-                              At the core of the platform is an extensive array of workout plans,<br>
-                              each detailed with descriptions, targeted muscle groups,
-                              difficulty levels, and structured <br>
-                              schedules. This rich information empowers users to amke informed choices,
-                              ensuring that their<br> selected workout plan aligns perfectly with their
-                              fitness objectives and physical capabilities.<br>
-                              Fitness-Tracker is tailored to meet the diverse needs of its users,
-                              providing a seamless and user-<br>
-                              friendly experience for creating personalized workout
-                              plans to enhance their health and fitness <br>
-                              journey.</p>
-                    </div>
+<div class="homepage-wrapper">
+    <!-- Background Blur Decorative Elements -->
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
 
-               </div>
-          </div>
-     </div>
+    <div class="container py-5">
+        <!-- Hero Section -->
+        <div class="hero-section text-center py-5 mb-5 animate-fade-in">
+            <h1 class="hero-title mb-3">
+                Track Your Fitness <span class="gradient-text">Journey 💪</span>
+            </h1>
+            <p class="hero-subtitle mb-4">
+                Smart workouts, AI insights, real results.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button type="button" class="btn btn-primary btn-lg px-4 py-3 hero-btn-glow" (click)="onStartWorkout()">
+                    <i class="bi bi-play-fill me-1"></i> Start Workout
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg px-4 py-3" (click)="onExplorePlans()">
+                    <i class="bi bi-compass me-1"></i> Explore Plans
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats Section -->
+        <div class="row justify-content-center g-4 mb-5 animate-fade-in delay-1">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="stat-card text-center p-4">
+                    <div class="stat-icon-wrapper mb-3 icon-calories">
+                        <i class="bi bi-fire"></i>
+                    </div>
+                    <h3 class="stat-value mb-1">425,800</h3>
+                    <p class="stat-label mb-0">Calories Burned (kcal)</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="stat-card text-center p-4">
+                    <div class="stat-icon-wrapper mb-3 icon-workouts">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <h3 class="stat-value mb-1">1,280+</h3>
+                    <p class="stat-label mb-0">Workouts Completed</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="stat-card text-center p-4">
+                    <div class="stat-icon-wrapper mb-3 icon-plans">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <h3 class="stat-value mb-1">18</h3>
+                    <p class="stat-label mb-0">Active Plans</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Header -->
+        <div class="text-center mb-5 animate-fade-in delay-2">
+            <h2 class="section-title">Core Features</h2>
+            <div class="title-underline"></div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="row g-4 animate-fade-in delay-2">
+            <!-- Feature 1 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-calendar2-check"></i>
+                    </div>
+                    <h4 class="feature-title mb-2">Workout Plans</h4>
+                    <p class="feature-text mb-0">
+                        Browse and apply for curated fitness plans tailored for flexibility, strength, or cardiovascular endurance.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h4 class="feature-title mb-2">AI Symptom Checker</h4>
+                    <p class="feature-text mb-0">
+                        Input your symptoms and get instant recommendations on diets, workouts, and precautions powered by machine learning.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h4 class="feature-title mb-2">Progress Tracking</h4>
+                    <p class="feature-text mb-0">
+                        Monitor your logs, schedule requests, completed sessions, and feedback history in one central dashboard.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100 p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <h4 class="feature-title mb-2">Custom Programs</h4>
+                    <p class="feature-text mb-0">
+                        Submit custom requests with age, BMI, and dietary preferences to receive specialized routines from trainers.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
