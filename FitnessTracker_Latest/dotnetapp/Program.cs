@@ -97,10 +97,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("User", p => p.RequireRole("User"));
 });
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-});
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -173,10 +170,7 @@ Log.Logger=new LoggerConfiguration()
         )
         .CreateLogger();
 builder.Host.UseSerilog();
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-});
+builder.Services.AddControllers();
     
 builder.Logging.AddLog4Net("log4net.config");
 // builder.Services.AddTransient<ExceptionMiddleware>();

@@ -62,7 +62,9 @@ export class UserviewworkoutComponent implements OnInit {
       next: (reqs) => {
         this.appliedWorkoutIds.clear();
         (reqs ?? []).forEach(r => {
-          if (r?.WorkoutId) this.appliedWorkoutIds.add(r.WorkoutId);
+          if (r?.WorkoutId || r?.workoutId) {
+            this.appliedWorkoutIds.add(r.WorkoutId || r.workoutId);
+          }
         });
       },
       error: (err) => {
@@ -80,10 +82,10 @@ export class UserviewworkoutComponent implements OnInit {
     }
     this.filteredWorkouts = this.workouts.filter(w => {
       return [
-        w.WorkoutName,
-        w.Description,
-        w.DifficultyLevel,
-        w.TargetArea
+        w.workoutName,
+        w.description,
+        w.difficultyLevel,
+        w.targetArea
       ]
         .filter(Boolean)
         .some(v => ('' + v).toLowerCase().includes(q));

@@ -47,30 +47,30 @@
             <thead>
                 <tr>
                     <th style="width: 70px;">#</th>
-                    <th class="sortable" (click)="setSort('WorkoutName')">
+                    <th class="sortable" (click)="setSort('workoutName')">
                         Workout Name 
-                        <i class="bi" [ngClass]="sortColumn === 'WorkoutName' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                        <i class="bi" [ngClass]="sortColumn === 'workoutName' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
                     </th>
                     <th>Description</th>
-                    <th class="sortable" (click)="setSort('DifficultyLevel')" style="width: 150px;">
+                    <th class="sortable" (click)="setSort('difficultyLevel')" style="width: 150px;">
                         Difficulty 
-                        <i class="bi" [ngClass]="sortColumn === 'DifficultyLevel' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                        <i class="bi" [ngClass]="sortColumn === 'difficultyLevel' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
                     </th>
-                    <th class="sortable" (click)="setSort('TargetArea')" style="width: 150px;">
+                    <th class="sortable" (click)="setSort('targetArea')" style="width: 150px;">
                         Target Area 
-                        <i class="bi" [ngClass]="sortColumn === 'TargetArea' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                        <i class="bi" [ngClass]="sortColumn === 'targetArea' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
                     </th>
-                    <th class="sortable" (click)="setSort('DaysPerWeek')" style="width: 140px;">
+                    <th class="sortable" (click)="setSort('daysPerWeek')" style="width: 140px;">
                         Days / Week 
-                        <i class="bi" [ngClass]="sortColumn === 'DaysPerWeek' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                        <i class="bi" [ngClass]="sortColumn === 'daysPerWeek' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
                     </th>
-                    <th class="sortable" (click)="setSort('AverageWorkoutDurationInMinutes')" style="width: 150px;">
+                    <th class="sortable" (click)="setSort('averageWorkoutDurationInMinutes')" style="width: 150px;">
                         Duration (Min) 
-                        <i class="bi" [ngClass]="sortColumn === 'AverageWorkoutDurationInMinutes' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                        <i class="bi" [ngClass]="sortColumn === 'averageWorkoutDurationInMinutes' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
                     </th>
-                    <th class="sortable" (click)="setSort('CreatedAt')" style="width: 160px;">
+                    <th class="sortable" (click)="setSort('createdAt')" style="width: 160px;">
                         Created 
-                        <i class="bi" [ngClass]="sortColumn === 'CreatedAt' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
+                        <i class="bi" [ngClass]="sortColumn === 'createdAt' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
                     </th>
                     <th style="width: 150px; text-align: center;">Action</th>
                 </tr>
@@ -78,25 +78,25 @@
             <tbody>
                 <tr *ngFor="let item of paginatedWorkouts; let i = index;">
                     <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-                    <td class="workout-name-cell">{{ item.WorkoutName }}</td>
-                    <td class="description-cell">{{ item.Description }}</td>
+                    <td class="workout-name-cell">{{ item.workoutName }}</td>
+                    <td class="description-cell">{{ item.description }}</td>
                     <td>
-                        <span class="difficulty-badge" [ngClass]="getDifficultyClass(item.DifficultyLevel)">
-                            {{ getDifficultyLabel(item.DifficultyLevel) }}
+                        <span class="difficulty-badge" [ngClass]="getDifficultyClass(item.difficultyLevel)">
+                            {{ getDifficultyLabel(item.difficultyLevel) }}
                         </span>
                     </td>
-                    <td>{{ item.TargetArea }}</td>
-                    <td>{{ item.DaysPerWeek }}x</td>
-                    <td>{{ item.AverageWorkoutDurationInMinutes }}</td>
-                    <td>{{ item.CreatedAt | date:'MMM d, y' }}</td>
+                    <td>{{ item.targetArea }}</td>
+                    <td>{{ item.daysPerWeek }}x</td>
+                    <td>{{ item.averageWorkoutDurationInMinutes }}</td>
+                    <td>{{ item.createdAt | date:'MMM d, y' }}</td>
                     <td class="text-center">
                         <button
                             class="btn btn-action-pill"
-                            [ngClass]="isApplied(item.WorkoutId) ? 'btn-applied' : 'btn-apply'"
-                            [disabled]="isApplied(item.WorkoutId)"
-                            (click)="onApply(item.WorkoutId)">
-                            <i class="bi" [ngClass]="isApplied(item.WorkoutId) ? 'bi-check-circle-fill me-1' : 'bi-plus-circle-fill me-1'"></i>
-                            {{ isApplied(item.WorkoutId) ? 'Applied' : 'Apply' }}
+                            [ngClass]="isApplied(item.workoutId) ? 'btn-applied' : 'btn-apply'"
+                            [disabled]="isApplied(item.workoutId)"
+                            (click)="onApply(item.workoutId)">
+                            <i class="bi" [ngClass]="isApplied(item.workoutId) ? 'bi-check-circle-fill me-1' : 'bi-plus-circle-fill me-1'"></i>
+                            {{ isApplied(item.workoutId) ? 'Applied' : 'Apply' }}
                         </button>
                     </td>
                 </tr>

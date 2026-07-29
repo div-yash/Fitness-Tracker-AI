@@ -55,8 +55,8 @@ export class AdminviewworkoutComponent implements OnInit {
     }
   
     this.filtered = this.workouts.filter(w => {
-      const name = (w.WorkoutName || w['workoutName'] || '').toString().toLowerCase();
-      const desc = (w.Description || w['description'] || '').toString().toLowerCase();
+      const name = (w.workoutName || w['WorkoutName'] || '').toString().toLowerCase();
+      const desc = (w.description || w['Description'] || '').toString().toLowerCase();
       
       return name.includes(t) || desc.includes(t);
     });
