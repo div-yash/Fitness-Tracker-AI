@@ -1,6 +1,6 @@
 # 💪 Fitness Tracker AI — Premium Gym & AI Diagnostics Platform
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-brightgreen?style=for-the-badge&logo=vercel)](https://fitness-tracker-glh7yv3e4-div-yashs-projects.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-brightgreen?style=for-the-badge&logo=vercel)](https://fitness-tracker-ai-lemon.vercel.app/)
 [![Backend API](https://img.shields.io/badge/Backend%20API-Render-blue?style=for-the-badge&logo=render)](https://fitnesstracker-backend-ijcv.onrender.com/swagger/index.html)
 [![AI Diagnostics](https://img.shields.io/badge/AI%20Diagnostics-Flask-blueviolet?style=for-the-badge&logo=flask)](https://fitness-tracker-ai-97qn.onrender.com)
 
