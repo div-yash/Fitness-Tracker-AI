@@ -1,47 +1,76 @@
-<nav class="navbar navbar-expand-lg py-2" style="background: linear-gradient(to right, #2c2f3c, #4b4fa5);">
-  <div class="container-fluid">
-
-    <a class="navbar-brand text-white m-0 fw-semibold">FITNESS-TRACKER</a>
-
-    <div class="ms-auto d-flex align-items-center gap-3">
-
-      <!-- <span class="badge border text-white px-2 py-1 rounded-2"
-        style="font-size: 15px; border-color: rgba(255,255,255,0.9);">
-        {{ roleLabel }}
-      </span> -->
-
-      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-        #home="routerLinkActive" class="nav-link" [ngClass]="home.isActive ? 'home-active' : 'home-default'">
-        Home
-      </a>
-
-      <a routerLink="/userviewworkout" routerLinkActive="active" #work="routerLinkActive" class="nav-link"
-        [ngClass]="work.isActive ? 'home-active' : 'home-default'">
-        Workout
-      </a>
-
-      <a routerLink="/userappliedworkout" routerLinkActive="active" class="nav-link text-white fw-medium"
-        style="text-decoration: none;">
-        Applied WorkoutRequest
-      </a>
-
-      <a routerLink="/symptomchecker" routerLinkActive="active" class="nav-link text-white fw-medium"
-        style="text-decoration: none;">
-        Symptom Checker
-      </a>
-
-      <div class="nav-item dropdown position-relative hover-dropdown">
-        <a class="nav-link text-white dropdown-toggle pe-none" role="button">Feedbacks</a>
-        <ul class="dropdown-menu shadow border-0 rounded-3 mt-1 py-1 custom-dropdown">
-          <li><a class="dropdown-item py-2" routerLink="/useraddfeedback">Add Feedback</a></li>
-          <li><a class="dropdown-item py-2" routerLink="/userviewfeedback">View Feedback</a></li>
-        </ul>
+<nav class="navbar navbar-expand-lg app-glass-nav sticky-top">
+  <div class="container-fluid px-lg-4">
+    <!-- Brand -->
+    <a class="navbar-brand d-flex align-items-center gap-2 cursor-pointer" routerLink="/home" (click)="closeMenu()">
+      <div class="brand-icon-box">
+        <i class="bi bi-fire"></i>
       </div>
+      <span class="brand-title">FITTRACK <span class="brand-badge">USER</span></span>
+    </a>
 
-      <a routerLink="/home" (click)="onLogout()" class="btn btn-danger"
-        style="border: 2px solid red; padding: 6px 14px; color: red; background: white; border-radius: 6px;">
-        Logout
-      </a>
+    <!-- Mobile Hamburger Toggler -->
+    <button class="navbar-toggler border-0 shadow-none text-light p-2" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <i class="bi" [ngClass]="isMenuCollapsed ? 'bi-list fs-2' : 'bi-x-lg fs-2'"></i>
+    </button>
+
+    <!-- Collapsible Menu -->
+    <div class="collapse navbar-collapse" [class.show]="!isMenuCollapsed">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-lg-1">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <i class="bi bi-house-door me-1"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/userviewworkout" routerLinkActive="active" (click)="closeMenu()">
+            <i class="bi bi-activity me-1"></i> Workouts
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/userappliedworkout" routerLinkActive="active" (click)="closeMenu()">
+            <i class="bi bi-calendar2-check me-1"></i> My Programs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/symptomchecker" routerLinkActive="active" (click)="closeMenu()">
+            <i class="bi bi-heart-pulse-fill text-danger me-1"></i> AI Diagnostics
+          </a>
+        </li>
+
+        <!-- Community Feedback Dropdown -->
+        <li class="nav-item dropdown position-relative" [class.show]="feedbackDropdownOpen">
+          <a class="nav-link dropdown-toggle cursor-pointer" role="button" (click)="toggleFeedback($event)">
+            <i class="bi bi-chat-square-quote me-1"></i> Reviews
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark custom-dropdown-menu shadow-lg border-0" [class.show]="feedbackDropdownOpen">
+            <li>
+              <a class="dropdown-item py-2" routerLink="/useraddfeedback" (click)="closeMenu()">
+                <i class="bi bi-pencil-square me-2 text-warning"></i> Submit Feedback
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2" routerLink="/userviewfeedback" (click)="closeMenu()">
+                <i class="bi bi-card-checklist me-2 text-info"></i> My Feedbacks
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- User Profile & Logout -->
+      <div class="d-flex align-items-center gap-3 py-2 py-lg-0 flex-wrap">
+        <div class="user-badge d-flex align-items-center gap-2">
+          <div class="user-avatar-circle">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <span class="user-name text-truncate" style="max-width: 150px;">{{ username }}</span>
+        </div>
+
+        <button class="btn btn-outline-danger btn-logout d-flex align-items-center gap-1" (click)="onLogout()">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </button>
+      </div>
 
     </div>
   </div>

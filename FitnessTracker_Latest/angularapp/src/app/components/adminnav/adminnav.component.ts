@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -7,26 +7,37 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './adminnav.component.html',
   styleUrls: ['./adminnav.component.css']
 })
-export class AdminnavComponent {
-  workoutOpen=false;
-  constructor(private authService:AuthService,private router:Router)
-  {
+export class AdminnavComponent implements OnInit {
+  isMenuCollapsed = true;
+  workoutDropdownOpen = false;
+  adminName = '';
 
-  }
-  toggleWorkout(){
-    this.workoutOpen=!this.workoutOpen;
-  }
-  openWorkout(){
-    this.workoutOpen=true;
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.adminName = localStorage.getItem('username') || 'Administrator';
   }
 
-  closeWorkout(){
-    this.workoutOpen=false;
+  toggleMenu(): void {
+    this.isMenuCollapsed = !this.isMenuCollapsed;
   }
 
-  onLogout(){
-    this.authService.logout()
-    this.router.navigate(['/login'])
+  closeMenu(): void {
+    this.isMenuCollapsed = true;
+    this.workoutDropdownOpen = false;
   }
 
+  toggleWorkout(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.workoutDropdownOpen = !this.workoutDropdownOpen;
+  }
+
+  onLogout(): void {
+    this.closeMenu();
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

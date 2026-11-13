@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -7,37 +7,37 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './usernav.component.html',
   styleUrls: ['./usernav.component.css']
 })
-export class UsernavComponent {
+export class UsernavComponent implements OnInit {
+  isMenuCollapsed = true;
+  feedbackDropdownOpen = false;
+  username = '';
 
-  workoutOpen = false;
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private authService:AuthService,private router:Router)
-  {
-
-  }
-  feedbackOpen = false;
-  roleLabel = 'user / User';
-
-  openWorkout() 
-  { 
-    this.workoutOpen = true; 
-  }
-  closeWorkout() 
-  { 
-    this.workoutOpen = false;
+  ngOnInit(): void {
+    this.username = localStorage.getItem('username') || 'Athlete';
   }
 
-  openFeedback() 
-  { 
-    this.feedbackOpen = true; 
-  }
-  closeFeedback() 
-  { 
-    this.feedbackOpen = false;
-  }
-  onLogout(){
-    this.authService.logout()
-    this.router.navigate(['/login'])
+  toggleMenu(): void {
+    this.isMenuCollapsed = !this.isMenuCollapsed;
   }
 
+  closeMenu(): void {
+    this.isMenuCollapsed = true;
+    this.feedbackDropdownOpen = false;
+  }
+
+  toggleFeedback(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.feedbackDropdownOpen = !this.feedbackDropdownOpen;
+  }
+
+  onLogout(): void {
+    this.closeMenu();
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

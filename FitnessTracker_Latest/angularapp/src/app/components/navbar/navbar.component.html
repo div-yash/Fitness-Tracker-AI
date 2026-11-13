@@ -1,19 +1,41 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4" *ngIf="!loggedIn">
-    <h4
-      class="navbar-brand fw-bold btn btn-link text-decoration-none p-0 m-0 text-light"
-      (click)="goHome()">
-      FITNESS-TRACKER
-</h4>
-   
-    <div class="ms-auto d-flex align-items-center gap-3">
-      <ng-container >
-        <a routerLink="/registration" class="btn btn-primary">Register</a>
-        <a routerLink="/login" class="btn btn-primary">Login</a>
-      </ng-container>
-   
+<!-- Public Navigation Bar -->
+<nav class="navbar navbar-expand-lg app-glass-nav sticky-top" *ngIf="!loggedIn">
+  <div class="container-fluid px-lg-4">
+    <!-- Brand -->
+    <a class="navbar-brand d-flex align-items-center gap-2 cursor-pointer" (click)="goHome()">
+      <div class="brand-icon-box">
+        <i class="bi bi-fire"></i>
+      </div>
+      <span class="brand-title">FITTRACK <span class="brand-badge">AI</span></span>
+    </a>
+
+    <!-- Mobile Hamburger Toggler -->
+    <button class="navbar-toggler border-0 shadow-none text-light p-2" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <i class="bi" [ngClass]="isMenuCollapsed ? 'bi-list fs-2' : 'bi-x-lg fs-2'"></i>
+    </button>
+
+    <!-- Collapsible Menu -->
+    <div class="collapse navbar-collapse" [class.show]="!isMenuCollapsed">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-lg-1">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <i class="bi bi-house-door me-1"></i> Home
+          </a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-2 py-2 py-lg-0">
+        <a routerLink="/login" class="btn btn-outline-light px-3 py-2 rounded-3" (click)="closeMenu()">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+        </a>
+        <a routerLink="/registration" class="btn btn-primary px-3 py-2 btn-nav-glow rounded-3" (click)="closeMenu()">
+          <i class="bi bi-person-plus me-1"></i> Get Started
+        </a>
+      </div>
     </div>
-  </nav>
-  <app-adminnav *ngIf="isAdmin && loggedIn"></app-adminnav>
-  <app-usernav *ngIf="isUser && loggedIn"></app-usernav>
-   
-   
+  </div>
+</nav>
+
+<!-- Admin and User Navbars (when logged in) -->
+<app-adminnav *ngIf="isAdmin && loggedIn"></app-adminnav>
+<app-usernav *ngIf="isUser && loggedIn"></app-usernav>
