@@ -29,7 +29,7 @@
                     <div class="stat-icon-wrapper mb-3 icon-calories">
                         <i class="bi bi-fire"></i>
                     </div>
-                    <h3 class="stat-value mb-1">425,800</h3>
+                    <h3 class="stat-value mb-1">{{ stats.caloriesBurned | number }}</h3>
                     <p class="stat-label mb-0">Calories Burned (kcal)</p>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                     <div class="stat-icon-wrapper mb-3 icon-workouts">
                         <i class="bi bi-activity"></i>
                     </div>
-                    <h3 class="stat-value mb-1">1,280+</h3>
+                    <h3 class="stat-value mb-1">{{ stats.workoutsCompleted | number }}+</h3>
                     <p class="stat-label mb-0">Workouts Completed</p>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                     <div class="stat-icon-wrapper mb-3 icon-plans">
                         <i class="bi bi-trophy"></i>
                     </div>
-                    <h3 class="stat-value mb-1">18</h3>
+                    <h3 class="stat-value mb-1">{{ stats.activePlans }}</h3>
                     <p class="stat-label mb-0">Active Plans</p>
                 </div>
             </div>

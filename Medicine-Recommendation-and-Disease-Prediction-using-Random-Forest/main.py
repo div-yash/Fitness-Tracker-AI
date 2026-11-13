@@ -61,10 +61,18 @@ diseases_list = {15: 'Fungal infection', 4: 'Allergy', 16: 'GERD', 9: 'Chronic c
 
 #model prediction function
 def get_predicted_value(patient_symptoms):
-  input_vector=np.zeros(len(symptoms_dict)) #creating empty array with zeros and length of array will be 132(length of symptoms_dict).
+  input_vector = np.zeros(len(symptoms_dict))
+  matched_count = 0
 
   for item in patient_symptoms:
-    input_vector[symptoms_dict[item]]=1
+    cleaned = str(item).strip().lower().replace(' ', '_').replace('-', '_').strip("[]'")
+    if cleaned in symptoms_dict:
+      input_vector[symptoms_dict[cleaned]] = 1
+      matched_count += 1
+
+  if matched_count == 0:
+    raise ValueError("No recognized symptoms matched. Please select symptoms from the suggested list.")
+
   return diseases_list[svc.predict([input_vector])[0]]
 
 
@@ -80,15 +88,11 @@ def index():
 @app.route('/predict',methods=['POST','GET'])
 def predict():
     if request.method=='POST':
-        symptoms=request.form.get('symptoms')
-        user_symptoms = [s.strip() for s in symptoms.split(',')]
-
-        user_symptoms = [sym.strip("[]'") for sym in user_symptoms]
+        symptoms = request.form.get('symptoms', '')
+        user_symptoms = [s.strip() for s in symptoms.split(',') if s.strip()]
         predicted_disease = get_predicted_value(user_symptoms)
 
-
         desc, pre, med, diet, work = helper(predicted_disease)
-
 
         #passing values to front-end:
         return render_template('index.html',predicted_disease=predicted_disease,dis_des=desc,dis_pre=pre,dis_med=med,dis_work=work,dis_diet=diet)
@@ -96,11 +100,19 @@ def predict():
 @app.route('/api/predict', methods=['POST'])
 def api_predict():
     try:
-        data = request.get_json()
-        symptoms_str = data.get('symptoms', '')
-        user_symptoms = [s.strip() for s in symptoms_str.split(',')]
-        user_symptoms = [sym.strip("[]'") for sym in user_symptoms]
-        
+        data = request.get_json(silent=True) or {}
+        symptoms_input = data.get('symptoms', '')
+
+        if isinstance(symptoms_input, list):
+            user_symptoms = symptoms_input
+        elif isinstance(symptoms_input, str):
+            user_symptoms = [s.strip() for s in symptoms_input.split(',') if s.strip()]
+        else:
+            user_symptoms = []
+
+        if not user_symptoms:
+            return {"status": "error", "message": "No symptoms provided. Please provide symptoms as a comma-separated string or array."}, 400
+
         # Run prediction
         predicted_disease = get_predicted_value(user_symptoms)
         
@@ -108,10 +120,10 @@ def api_predict():
         desc, pre, med, diet, work = helper(predicted_disease)
         
         # Clean up outputs
-        pre_list = [p_i for p_i in pre[0]] if len(pre) > 0 else []
-        med_list = [m.strip("[]'") for m in med[0]] if len(med) > 0 else []
-        diet_list = [d.strip("[]'") for d in diet[0]] if len(diet) > 0 else []
-        work_list = [w.strip("[]'") for w in work[0]] if len(work) > 0 else []
+        pre_list = [p_i for p_i in pre[0] if pd.notna(p_i)] if len(pre) > 0 else []
+        med_list = [m.strip("[]'") for m in med[0] if pd.notna(m)] if len(med) > 0 else []
+        diet_list = [d.strip("[]'") for d in diet[0] if pd.notna(d)] if len(diet) > 0 else []
+        work_list = [w.strip("[]'") for w in work[0] if pd.notna(w)] if len(work) > 0 else []
         
         return {
             "status": "success",

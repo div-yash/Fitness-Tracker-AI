@@ -81,6 +81,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<WorkoutService>();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<WorkoutRequestService>();
+builder.Services.AddScoped<SymptomHistoryService>();
 
 builder.Services.AddScoped<IPasswordHasher<ApplicationUser>,PasswordHasher<ApplicationUser>>();
 

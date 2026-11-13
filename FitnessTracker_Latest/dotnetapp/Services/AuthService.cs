@@ -12,7 +12,7 @@ namespace dotnetapp.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly string JWT_KEY = "bdndfnbfjknvdfvjnvnsdkjnsdclnsdcbcsdcbsj";
+        private readonly string JWT_KEY;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
@@ -25,6 +25,7 @@ namespace dotnetapp.Services
             _context = context;
             _configuration = configuration;
             _passwordHasher = passwordHasher;
+            JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY") ?? _configuration["Jwt:Key"] ?? "bdndfnbfjknvdfvjnvnsdkjnsdclnsdcbcsdcbsj";
         }
 
         public async Task<(int, string)> Registration(User model, string role)

@@ -1,16 +1,19 @@
-import { Component } from '@angular/core';
-import { RecommendationService } from './recommendation.service';
+import { Component, OnInit } from '@angular/core';
+import { RecommendationService, SymptomHistoryRecord } from './recommendation.service';
 
 @Component({
   selector: 'app-symptomchecker',
   templateUrl: './symptomchecker.component.html',
   styleUrls: ['./symptomchecker.component.css']
 })
-export class SymptomcheckerComponent {
+export class SymptomcheckerComponent implements OnInit {
   customSymptoms: string = '';
   isLoading: boolean = false;
   result: any = null;
   errorMessage: string = '';
+  saveSuccessMessage: string = '';
+  historyList: SymptomHistoryRecord[] = [];
+  userId: number = 0;
 
   // 40 popular symptoms for user selection
   popularSymptoms = [
@@ -58,8 +61,29 @@ export class SymptomcheckerComponent {
 
   constructor(private recommendationService: RecommendationService) {}
 
-  checkSymptoms() {
+  ngOnInit(): void {
+    const storedId = localStorage.getItem('UserId');
+    if (storedId) {
+      this.userId = parseInt(storedId, 10);
+      this.loadHistory();
+    }
+  }
+
+  loadHistory(): void {
+    if (!this.userId) return;
+    this.recommendationService.getUserDiagnosisHistory(this.userId).subscribe({
+      next: (data) => {
+        this.historyList = data || [];
+      },
+      error: (err) => {
+        console.warn('Could not load diagnosis history:', err);
+      }
+    });
+  }
+
+  checkSymptoms(): void {
     this.errorMessage = '';
+    this.saveSuccessMessage = '';
     this.result = null;
 
     // Combine selected symptoms and custom symptoms
@@ -87,6 +111,7 @@ export class SymptomcheckerComponent {
         this.isLoading = false;
         if (data.status === 'success') {
           this.result = data;
+          this.autoSaveDiagnosis(symptomsQuery, data);
         } else {
           this.errorMessage = data.message || 'Failed to analyze symptoms.';
         }
@@ -99,10 +124,73 @@ export class SymptomcheckerComponent {
     });
   }
 
-  reset() {
+  autoSaveDiagnosis(symptoms: string, data: any): void {
+    if (!this.userId) return;
+
+    const record: SymptomHistoryRecord = {
+      userId: this.userId,
+      symptoms: symptoms,
+      predictedDisease: data.disease,
+      description: data.description,
+      precautions: JSON.stringify(data.precautions || []),
+      medications: JSON.stringify(data.medications || []),
+      diets: JSON.stringify(data.diets || []),
+      workouts: JSON.stringify(data.workouts || [])
+    };
+
+    this.recommendationService.saveDiagnosisHistory(record).subscribe({
+      next: () => {
+        this.saveSuccessMessage = 'Diagnostic result saved to your health history.';
+        this.loadHistory();
+      },
+      error: (err) => {
+        console.warn('Could not auto-save diagnosis to history:', err);
+      }
+    });
+  }
+
+  viewPastRecord(record: SymptomHistoryRecord): void {
+    const parseSafe = (val?: string) => {
+      if (!val) return [];
+      try {
+        const parsed = JSON.parse(val);
+        return Array.isArray(parsed) ? parsed : [val];
+      } catch {
+        return val.split(',').map(s => s.trim());
+      }
+    };
+
+    this.result = {
+      disease: record.predictedDisease,
+      description: record.description || 'No description available.',
+      precautions: parseSafe(record.precautions),
+      medications: parseSafe(record.medications),
+      diets: parseSafe(record.diets),
+      workouts: parseSafe(record.workouts)
+    };
+    this.saveSuccessMessage = `Loaded past diagnosis from ${record.createdAt ? new Date(record.createdAt).toLocaleDateString() : 'history'}.`;
+  }
+
+  deleteHistoryRecord(id?: number, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!id) return;
+    if (confirm('Delete this diagnosis record from history?')) {
+      this.recommendationService.deleteDiagnosisHistory(id).subscribe({
+        next: () => {
+          this.historyList = this.historyList.filter(item => item.id !== id);
+        },
+        error: (err) => {
+          console.error('Failed to delete history record', err);
+        }
+      });
+    }
+  }
+
+  reset(): void {
     this.popularSymptoms.forEach(s => s.selected = false);
     this.customSymptoms = '';
     this.result = null;
     this.errorMessage = '';
+    this.saveSuccessMessage = '';
   }
 }

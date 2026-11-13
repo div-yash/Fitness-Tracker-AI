@@ -13,5 +13,6 @@ namespace dotnetapp.Data
         public DbSet<WorkoutRequest> WorkoutRequests { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<SymptomHistory> SymptomHistories { get; set; }
     }
 }

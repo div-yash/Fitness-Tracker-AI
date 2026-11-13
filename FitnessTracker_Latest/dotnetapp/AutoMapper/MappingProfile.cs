@@ -14,6 +14,7 @@ namespace dotnetapp.AutoMapper
 
             CreateMap<WorkoutRequest,WorkoutRequestDtos>().ReverseMap();
             CreateMap<Workout,WorkoutDtos>().ReverseMap();
+            CreateMap<SymptomHistory, SymptomHistoryDto>().ReverseMap();
         }
     }
 }
