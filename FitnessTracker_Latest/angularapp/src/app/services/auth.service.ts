@@ -27,15 +27,25 @@ export class AuthService {
       const token = result?.token;
       if(token){
         const payload = this.decodeToken(token);
-        const role = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || payload["role"];
-        const email = payload["http://schemas.xmlsoap.org/ws2005/05/identity/claims/emailaddress"] || payload["email"] || payload["sub"];
-        const username = payload["http://schemas.xmlsoap.org/ws2005/05/identity/claims/name"] || payload["unique_name"] || payload["name"];
-        const userId = payload["UserId"] || payload["userId"];
-        localStorage.setItem('role',role);
-        localStorage.setItem("token",token);
-        localStorage.setItem("email",email);
-        localStorage.setItem("username",username);
-        localStorage.setItem("UserId",userId);
+        const role = result?.role || payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || payload["role"] || 'User';
+        const email = result?.email || payload["http://schemas.xmlsoap.org/ws2005/05/identity/claims/emailaddress"] || payload["email"] || payload["sub"] || '';
+        let username = result?.username || payload["http://schemas.xmlsoap.org/ws2005/05/identity/claims/name"] || payload["unique_name"] || payload["name"];
+
+        if (!username || username === 'undefined' || username === 'null' || username.trim() === '') {
+          if (email && email !== 'undefined' && email !== 'null') {
+            const handle = email.split('@')[0];
+            username = handle.charAt(0).toUpperCase() + handle.slice(1);
+          } else {
+            username = 'Athlete';
+          }
+        }
+
+        const userId = result?.userId || payload["UserId"] || payload["userId"] || '0';
+        localStorage.setItem('role', role);
+        localStorage.setItem("token", token);
+        localStorage.setItem("email", email);
+        localStorage.setItem("username", username);
+        localStorage.setItem("UserId", userId);
       }
     }))
   }

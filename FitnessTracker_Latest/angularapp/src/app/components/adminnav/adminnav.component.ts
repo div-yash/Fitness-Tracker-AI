@@ -15,7 +15,12 @@ export class AdminnavComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    this.adminName = localStorage.getItem('username') || 'Administrator';
+    let raw = localStorage.getItem('username');
+    if (!raw || raw === 'undefined' || raw === 'null' || raw.trim() === '') {
+      raw = 'Administrator';
+      localStorage.setItem('username', raw);
+    }
+    this.adminName = raw;
   }
 
   toggleMenu(): void {

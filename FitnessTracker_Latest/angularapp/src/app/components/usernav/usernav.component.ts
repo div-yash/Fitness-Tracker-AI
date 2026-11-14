@@ -11,11 +11,24 @@ export class UsernavComponent implements OnInit {
   isMenuCollapsed = true;
   feedbackDropdownOpen = false;
   username = '';
+  email = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    this.username = localStorage.getItem('username') || 'Athlete';
+    let raw = localStorage.getItem('username');
+    this.email = localStorage.getItem('email') || '';
+
+    if (!raw || raw === 'undefined' || raw === 'null' || raw.trim() === '') {
+      if (this.email && this.email !== 'undefined' && this.email !== 'null') {
+        const handle = this.email.split('@')[0];
+        raw = handle.charAt(0).toUpperCase() + handle.slice(1);
+      } else {
+        raw = 'Athlete';
+      }
+      localStorage.setItem('username', raw);
+    }
+    this.username = raw;
   }
 
   toggleMenu(): void {

@@ -15,11 +15,12 @@ namespace dotnetapp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IAuthService authService, RoleManager<IdentityRole> roleManager)
+        public AuthenticationController(ILogger<AuthenticationController> logger, IAuthService authService, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
             _logger = logger;
             _authService = authService;
             _roleManager = roleManager;
+            _context = context;
         }
 
         [HttpPost("login")]
@@ -49,13 +50,24 @@ namespace dotnetapp.Controllers
                     });
                 }
 
+                var appUser = _context.Users.FirstOrDefault(u => u.Email == model.Email);
+                var resolvedName = appUser?.Username;
+                if (string.IsNullOrWhiteSpace(resolvedName))
+                {
+                    resolvedName = model.Email.Split('@')[0];
+                }
+
                 _logger.LogInformation("Logged In Successfully!");
                 return Ok(new
                 {
                     success = true,
                     message = "Login successfull",
                     token = token,
-                    tokenType = "Bearer"
+                    tokenType = "Bearer",
+                    username = resolvedName,
+                    email = model.Email,
+                    role = appUser?.UserRole ?? "User",
+                    userId = appUser?.UserId ?? 0
                 });
             }
             catch (Exception ex)
