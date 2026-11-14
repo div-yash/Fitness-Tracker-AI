@@ -1,89 +1,320 @@
 <div class="container py-4">
-    <h2 class="text-center section-title">Workout Requests for Approval</h2>
-
-    <div class="d-flex justify-content-start mb-3">
-        <input type="search" class="form-control search-input" placeholder="Search..." aria-label="Search workouts" />
+  <!-- Section Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h2 class="section-title m-0">
+        <i class="bi bi-inbox-fill text-primary me-2"></i>Workout Requests for Approval
+      </h2>
+      <p class="text-secondary small mt-1 mb-0">
+        Review athlete health metrics, approve custom regimens, or adjust pending requests.
+      </p>
     </div>
-
-    <div class="d-flex justify-content-end mb-3">
-        Filter by Status:
-        <select>
-            <option value="all">All</option>
-            <option value="approve">Approved</option>
-            <option value="reject">Rejected</option>
-        </select>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-dark border border-secondary text-secondary px-3 py-2 rounded-pill">
+        <i class="bi bi-collection me-1"></i> Total: {{ totalCount }}
+      </span>
     </div>
-
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-            <thead>
-                <tr>
-                    <th scope="col" style="width: 60px;">S.No</th>
-                    <th scope="col" style="min-width: 220px;">Username</th>
-                    <th scope="col" style="min-width: 140px;">Workout Name</th>
-                    <th scope="col" style="min-width: 140px;">Submission Date</th>
-                    <th scope="col" style="min-width: 120px;">Age</th>
-                    <th scope="col" style="min-width: 120px;">BMI</th>
-                    <th scope="col" style="min-width: 120px;">Gender</th>
-                    <th scope="col" style="min-width: 150px;">Dietary Preferences</th>
-                    <th scope="col" style="min-width: 150px;">Medical History</th>
-                    <th scope="col" style="min-width: 120px;">Status</th>
-                    <th scope="col" style="min-width: 140px;">Action</th>
-                </tr>
-            </thead>
-
-
-            <tbody>
-                <tr *ngFor="let item of workoutRequestList; let i = index">
-                    <td>{{ i + 1 }}</td> <!-- S.No starts at 1 -->
-                    <td>{{ item.user?.username }}</td> <!-- Username -->
-
-                    <td>{{ item.workout?.workoutName }}</td> <!-- Workout Name -->
-
-                    <td>{{ item.requestedDate | date: 'yyyy-MM-dd' }}</td> <!-- Submission Date -->
-
-                    <td>{{ item.age }}</td>
-                    <td>{{ item.bmi }}</td>
-                    <td>{{ item.gender }}</td>
-                    <td>{{ item.dietaryPreferences }}</td>
-                    <td>{{ item.medicalHistory }}</td>
-
-                    <td>
-                        <span class="badge" [ngClass]="{'bg-secondary': item.requestStatus === 'Pending',
-                        'bg-success': item.requestStatus === 'Approved','bg-danger': item.requestStatus === 'Rejected'}">
-                            {{ item.requestStatus }}
-                    </span>
-                    </td>
-
-                    <td>
-                        <button (click)="onView(item)" class="btn btn-info btn-sm">View</button>
-                        <button (click)="onApprove(item)" class="btn btn-success btn-sm">Approve</button>
-                        <button (click)="onReject(item)" class="btn btn-warning btn-sm">Reject</button>
-                    </td>
-                </tr>
-
-                <tr *ngIf="!workoutRequestList || workoutRequestList.length === 0">
-                    <td colspan="11" class="empty-state">
-                        Oops! No records found
-                    </td>
-                </tr>
-            </tbody>
-
-        </table>
-    </div>
-</div>
-
-
-<div class="modal-backdrop" *ngIf="showModal"></div>
-
-<div class="modal-box" *ngIf="showModal">
-  <div class="modal-header">
-    <h5>Workout Details</h5>
-    <button class="close-btn" (click)="closeModal()">×</button>
   </div>
 
-  <div class="modal-body">
-    <p><strong>Description:</strong> {{ selectedItem?.workout?.description }}</p>
-    <p><strong>Target Area:</strong> {{ selectedItem?.workout?.targetArea }}</p>
-    <p><strong>Duration:</strong> {{ selectedItem?.workout?.averageWorkoutDurationInMinutes }} mins</p>
+  <!-- Filter & Search Toolbar -->
+  <div class="card p-3 mb-4 shadow-sm border-0 toolbar-card">
+    <div class="row g-3 align-items-center">
+      <!-- Search Input -->
+      <div class="col-12 col-md-5 col-lg-4">
+        <div class="input-group">
+          <span class="input-group-text search-icon-addon">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input
+            type="search"
+            class="form-control search-input"
+            placeholder="Search by athlete, workout, diet..."
+            [(ngModel)]="searchTerm"
+            aria-label="Search workout requests"
+          />
+          <button *ngIf="searchTerm" class="btn btn-dark border-start-0" (click)="searchTerm = ''">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Filter Tabs -->
+      <div class="col-12 col-md-7 col-lg-8">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+          <button
+            class="btn filter-tab-btn"
+            [class.active]="statusFilter === 'all'"
+            (click)="setFilter('all')"
+          >
+            All <span class="tab-badge">{{ totalCount }}</span>
+          </button>
+          <button
+            class="btn filter-tab-btn tab-pending"
+            [class.active]="statusFilter === 'pending'"
+            (click)="setFilter('pending')"
+          >
+            <i class="bi bi-hourglass-split me-1 text-warning"></i> Pending
+            <span class="tab-badge tab-badge-pending">{{ pendingCount }}</span>
+          </button>
+          <button
+            class="btn filter-tab-btn tab-approved"
+            [class.active]="statusFilter === 'approved'"
+            (click)="setFilter('approved')"
+          >
+            <i class="bi bi-check-circle-fill me-1 text-success"></i> Approved
+            <span class="tab-badge tab-badge-approved">{{ approvedCount }}</span>
+          </button>
+          <button
+            class="btn filter-tab-btn tab-rejected"
+            [class.active]="statusFilter === 'rejected'"
+            (click)="setFilter('rejected')"
+          >
+            <i class="bi bi-x-circle-fill me-1 text-danger"></i> Rejected
+            <span class="tab-badge tab-badge-rejected">{{ rejectedCount }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="text-center py-5" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading requests...</span>
+    </div>
+    <p class="text-secondary small mt-2">Loading athlete requests...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="card p-5 text-center my-4 empty-card" *ngIf="!isLoading && filteredRequests.length === 0">
+    <div class="empty-icon-wrap mb-3">
+      <i class="bi bi-clipboard2-x"></i>
+    </div>
+    <h5 class="text-white mb-1">No Matching Requests Found</h5>
+    <p class="text-secondary small mb-3">
+      {{ searchTerm ? 'Try adjusting your search criteria.' : 'There are currently no requests in this category.' }}
+    </p>
+    <div>
+      <button class="btn btn-outline-primary btn-sm" (click)="searchTerm = ''; statusFilter = 'all'">
+        Reset Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Responsive Grid of Small Request Card Boxes -->
+  <div class="row g-4" *ngIf="!isLoading && filteredRequests.length > 0">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let item of filteredRequests">
+      <div class="request-box-card h-100 d-flex flex-column justify-content-between">
+        
+        <!-- Top Section: Header & Workout -->
+        <div>
+          <!-- Card Header: User Avatar + Name + Status -->
+          <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-dark-subtle">
+            <div class="d-flex align-items-center gap-2">
+              <div class="athlete-avatar">
+                {{ getInitials(item.user?.username) }}
+              </div>
+              <div>
+                <h6 class="athlete-name mb-0 text-white text-truncate" style="max-width: 140px;" [title]="item.user?.username || 'Athlete'">
+                  {{ item.user?.username || 'Athlete' }}
+                </h6>
+                <span class="text-muted small" style="font-size: 11.5px;">
+                  <i class="bi bi-calendar3 me-1"></i>{{ item.requestedDate | date:'mediumDate' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Glowing Status Badge -->
+            <span
+              class="badge status-badge"
+              [ngClass]="{
+                'status-pending': (item.requestStatus || '').toLowerCase() === 'pending',
+                'status-approved': (item.requestStatus || '').toLowerCase() === 'approved',
+                'status-rejected': (item.requestStatus || '').toLowerCase() === 'rejected'
+              }"
+            >
+              <i
+                class="bi me-1"
+                [ngClass]="{
+                  'bi-hourglass-split': (item.requestStatus || '').toLowerCase() === 'pending',
+                  'bi-check-circle-fill': (item.requestStatus || '').toLowerCase() === 'approved',
+                  'bi-x-circle-fill': (item.requestStatus || '').toLowerCase() === 'rejected'
+                }"
+              ></i>
+              {{ item.requestStatus }}
+            </span>
+          </div>
+
+          <!-- Workout Plan Banner -->
+          <div class="workout-banner p-3 mb-3 rounded-3">
+            <span class="text-uppercase small text-muted fw-bold d-block" style="font-size: 11px;">
+              Requested Plan
+            </span>
+            <h5 class="workout-title text-white mb-2 text-truncate" [title]="item.workout?.workoutName">
+              {{ item.workout?.workoutName || 'Custom Program' }}
+            </h5>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="badge badge-target" *ngIf="item.workout?.targetArea">
+                <i class="bi bi-bullseye me-1"></i>{{ item.workout.targetArea }}
+              </span>
+              <span class="badge badge-duration" *ngIf="item.workout?.averageWorkoutDurationInMinutes">
+                <i class="bi bi-stopwatch me-1"></i>{{ item.workout.averageWorkoutDurationInMinutes }}m
+              </span>
+              <span class="badge badge-frequency" *ngIf="item.workout?.daysPerWeek">
+                <i class="bi bi-calendar-week me-1"></i>{{ item.workout.daysPerWeek }}d/wk
+              </span>
+            </div>
+          </div>
+
+          <!-- Biometric Quad Stat Grid -->
+          <div class="biometrics-grid mb-3">
+            <div class="stat-pill">
+              <span class="stat-pill-label">Age</span>
+              <span class="stat-pill-val text-white">{{ item.age || '--' }} yrs</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">BMI</span>
+              <span class="stat-pill-val" [ngClass]="getBmiClass(item.bmi)">
+                {{ item.bmi || '--' }} <small>({{ getBmiLabel(item.bmi) }})</small>
+              </span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">Gender</span>
+              <span class="stat-pill-val text-white">{{ item.gender || '--' }}</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">Diet</span>
+              <span class="stat-pill-val text-white text-truncate" [title]="item.dietaryPreferences">
+                {{ item.dietaryPreferences || 'Standard' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Medical History Box -->
+          <div class="mb-3">
+            <div
+              *ngIf="item.medicalHistory && item.medicalHistory !== 'None' && item.medicalHistory !== 'none'"
+              class="medical-alert-box p-2 rounded-2"
+              [title]="item.medicalHistory"
+            >
+              <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+              <span class="small text-warning fw-semibold">Medical Note: </span>
+              <span class="small text-secondary text-truncate d-inline-block align-middle" style="max-width: 170px;">
+                {{ item.medicalHistory }}
+              </span>
+            </div>
+
+            <div
+              *ngIf="!item.medicalHistory || item.medicalHistory === 'None' || item.medicalHistory === 'none'"
+              class="medical-clean-box p-2 rounded-2"
+            >
+              <i class="bi bi-shield-check text-success me-1"></i>
+              <span class="small text-muted">No Medical Conditions</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Action Footer -->
+        <div class="pt-3 border-top border-dark-subtle d-flex align-items-center gap-2">
+          <button
+            class="btn btn-sm btn-outline-info flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+            (click)="onView(item)"
+          >
+            <i class="bi bi-info-circle"></i>
+            <span>Details</span>
+          </button>
+
+          <button
+            class="btn btn-sm btn-success flex-grow-1 d-flex align-items-center justify-content-center gap-1 btn-action-approve"
+            [disabled]="(item.requestStatus || '').toLowerCase() === 'approved'"
+            (click)="onApprove(item, $event)"
+          >
+            <i class="bi bi-check-lg"></i>
+            <span>Approve</span>
+          </button>
+
+          <button
+            class="btn btn-sm btn-outline-danger flex-grow-1 d-flex align-items-center justify-content-center gap-1 btn-action-reject"
+            [disabled]="(item.requestStatus || '').toLowerCase() === 'rejected'"
+            (click)="onReject(item, $event)"
+          >
+            <i class="bi bi-x-lg"></i>
+            <span>Reject</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dark Glassmorphic Workout Details Modal -->
+<div class="modal-backdrop-dark animate-fade-in" *ngIf="showModal" (click)="closeModal()"></div>
+
+<div class="modal-box-dark animate-scale-in" *ngIf="showModal">
+  <div class="modal-header-dark d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-dark-subtle">
+    <div class="d-flex align-items-center gap-2">
+      <div class="modal-icon-badge">
+        <i class="bi bi-card-checklist text-primary"></i>
+      </div>
+      <div>
+        <h5 class="text-white m-0">Workout Plan Details</h5>
+        <span class="text-muted small">Requested by {{ selectedItem?.user?.username || 'Athlete' }}</span>
+      </div>
+    </div>
+    <button class="modal-close-btn" (click)="closeModal()" aria-label="Close modal">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="modal-body-dark">
+    <!-- Program Summary Card -->
+    <div class="p-3 mb-3 rounded-3" style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-slate);">
+      <h6 class="text-primary fw-bold mb-1">{{ selectedItem?.workout?.workoutName }}</h6>
+      <p class="text-secondary small mb-2" style="line-height: 1.6;">
+        {{ selectedItem?.workout?.description || 'No detailed description provided for this workout plan.' }}
+      </p>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge bg-dark border border-secondary text-secondary">
+          <i class="bi bi-bullseye me-1 text-primary"></i>Target: {{ selectedItem?.workout?.targetArea || 'Full Body' }}
+        </span>
+        <span class="badge bg-dark border border-secondary text-secondary">
+          <i class="bi bi-clock me-1 text-warning"></i>Duration: {{ selectedItem?.workout?.averageWorkoutDurationInMinutes || 45 }} mins
+        </span>
+        <span class="badge bg-dark border border-secondary text-secondary" *ngIf="selectedItem?.workout?.difficultyLevel">
+          <i class="bi bi-speedometer2 me-1 text-danger"></i>Difficulty: Level {{ selectedItem?.workout?.difficultyLevel }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Athlete Biometrics Overview -->
+    <div class="p-3 mb-4 rounded-3" style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-slate);">
+      <h6 class="text-white small text-uppercase fw-bold mb-3">
+        <i class="bi bi-person-lines-fill text-info me-1"></i> Athlete Profile
+      </h6>
+      <div class="row g-2 text-secondary small">
+        <div class="col-6"><strong>Age:</strong> {{ selectedItem?.age }} yrs</div>
+        <div class="col-6"><strong>BMI:</strong> {{ selectedItem?.bmi }} ({{ getBmiLabel(selectedItem?.bmi) }})</div>
+        <div class="col-6"><strong>Gender:</strong> {{ selectedItem?.gender }}</div>
+        <div class="col-6"><strong>Diet:</strong> {{ selectedItem?.dietaryPreferences }}</div>
+        <div class="col-12 mt-2">
+          <strong>Medical History:</strong>
+          <span [class.text-warning]="selectedItem?.medicalHistory !== 'None'">
+            {{ selectedItem?.medicalHistory || 'None' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer-dark d-flex justify-content-end gap-2 pt-3 border-top border-dark-subtle">
+    <button class="btn btn-secondary btn-sm px-3" (click)="closeModal()">Close</button>
+    <button
+      class="btn btn-success btn-sm px-3"
+      [disabled]="(selectedItem?.requestStatus || '').toLowerCase() === 'approved'"
+      (click)="onApprove(selectedItem); closeModal()"
+    >
+      <i class="bi bi-check-lg me-1"></i> Approve Request
+    </button>
+  </div>
 </div>
