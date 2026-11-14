@@ -19,6 +19,7 @@ export class UserviewworkoutComponent implements OnInit {
   workouts: Workout[] = [];
   filteredWorkouts: Workout[] = [];
   searchTerm = '';
+  selectedDifficulty = 'all';
   loading = false;
   serverError = '';
 
@@ -27,7 +28,7 @@ export class UserviewworkoutComponent implements OnInit {
 
   // Pagination & Sorting properties
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 9; // 9 cards per page for 3x3 grid
   sortColumn = '';
   sortAscending = true;
   Math = Math;
@@ -73,14 +74,26 @@ export class UserviewworkoutComponent implements OnInit {
     });
   }
 
+  setDifficultyFilter(diff: string): void {
+    this.selectedDifficulty = diff;
+    this.applyFilter();
+  }
+
   applyFilter(): void {
     this.currentPage = 1;
     const q = (this.searchTerm || '').trim().toLowerCase();
-    if (!q) {
-      this.filteredWorkouts = [...this.workouts];
-      return;
-    }
+    
     this.filteredWorkouts = this.workouts.filter(w => {
+      // 1. Difficulty Filter
+      if (this.selectedDifficulty !== 'all') {
+        const diffLabel = this.getDifficultyLabel(w.difficultyLevel).toLowerCase();
+        if (diffLabel !== this.selectedDifficulty.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 2. Search Term Filter
+      if (!q) return true;
       return [
         w.workoutName,
         w.description,
@@ -143,6 +156,7 @@ export class UserviewworkoutComponent implements OnInit {
   setPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 

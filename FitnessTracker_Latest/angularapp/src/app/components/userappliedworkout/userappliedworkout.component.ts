@@ -1,9 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { WorkoutRequest } from 'src/app/models/workoutrequest.model';
 import { WorkoutService } from 'src/app/services/workout.service';
 import { WorkoutrequestService } from 'src/app/services/workoutrequest.service';
-import { Workout } from 'src/app/models/workout.model';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -11,62 +9,148 @@ import { forkJoin } from 'rxjs';
   templateUrl: './userappliedworkout.component.html',
   styleUrls: ['./userappliedworkout.component.css']
 })
-export class UserappliedworkoutComponent {
+export class UserappliedworkoutComponent implements OnInit {
   appliedList: any[] = [];
+  filteredList: any[] = [];
   userId = localStorage.getItem('UserId');
-  message = '';
   loading = false;
+  serverError = '';
+  searchTerm = '';
+  statusFilter: 'all' | 'pending' | 'approved' | 'rejected' = 'all';
 
-  constructor(private workoutReqService: WorkoutrequestService,private workoutService: WorkoutService) {}
+  // Delete modal state
+  showDeleteModal = false;
+  selectedRequestId: number | null = null;
+
+  constructor(
+    private workoutReqService: WorkoutrequestService,
+    private workoutService: WorkoutService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.getAppliedWorkouts();
   }
 
-  getAppliedWorkouts() {
+  getAppliedWorkouts(): void {
     this.loading = true;
-    this.message = '';
+    this.serverError = '';
 
     forkJoin({
       workouts: this.workoutService.getAllWorkouts(),
       applications: this.workoutReqService.getAppliedWorkouts(this.userId)
     }).subscribe({
       next: ({ workouts, applications }) => {
-        const nameById = new Map<number, string>();
+        const workoutMap = new Map<number, any>();
         (workouts || []).forEach((w: any) => {
-          nameById.set(Number(w.workoutId), w.workoutName);
+          workoutMap.set(Number(w.workoutId), w);
         });
 
-        this.appliedList = (applications || []).map((app: any) => ({
-          ...app,
-          workoutName: nameById.get(Number(app.workoutId)) || ''
-        }));
+        this.appliedList = (applications || []).map((app: any) => {
+          const w = workoutMap.get(Number(app.workoutId));
+          return {
+            ...app,
+            workoutName: w?.workoutName || app.workoutName || 'Custom Program',
+            targetArea: w?.targetArea || 'Full Body',
+            duration: w?.averageWorkoutDurationInMinutes || 45,
+            daysPerWeek: w?.daysPerWeek || 3,
+            difficultyLevel: w?.difficultyLevel || 2
+          };
+        });
 
-        this.message = this.appliedList.length ? '' : 'No applied workouts found.';
+        this.applyFilter();
         this.loading = false;
       },
       error: () => {
-        this.message = 'Error loading data.';
+        this.serverError = 'Failed to load your workout applications.';
         this.loading = false;
       }
     });
   }
 
-  deleteApplication(id?: number) {
-    if (id && confirm('Delete this application?')) {
-      this.workoutReqService.deleteWorkoutApplication(id)
-        .subscribe({
-          next: (response) => {
-            this.appliedList = this.appliedList.filter(item => item.workoutRequestId !== id);
-            
-            if (this.appliedList.length === 0) {
-              this.message = 'No applied workouts found.';
-            }
-          },
-          error: () => {
-            this.message = 'Error deleting application.';
-          }
-        });
-    }
+  setFilter(status: 'all' | 'pending' | 'approved' | 'rejected'): void {
+    this.statusFilter = status;
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const term = (this.searchTerm || '').trim().toLowerCase();
+    this.filteredList = this.appliedList.filter(item => {
+      const statusMatch =
+        this.statusFilter === 'all' ||
+        (item.requestStatus || '').toLowerCase() === this.statusFilter;
+
+      if (!statusMatch) return false;
+      if (!term) return true;
+
+      const name = (item.workoutName || '').toLowerCase();
+      const diet = (item.dietaryPreferences || '').toLowerCase();
+      const med = (item.medicalHistory || '').toLowerCase();
+      return name.includes(term) || diet.includes(term) || med.includes(term);
+    });
+  }
+
+  get totalCount(): number {
+    return this.appliedList.length;
+  }
+
+  get pendingCount(): number {
+    return this.appliedList.filter(i => (i.requestStatus || '').toLowerCase() === 'pending').length;
+  }
+
+  get approvedCount(): number {
+    return this.appliedList.filter(i => (i.requestStatus || '').toLowerCase() === 'approved').length;
+  }
+
+  get rejectedCount(): number {
+    return this.appliedList.filter(i => (i.requestStatus || '').toLowerCase() === 'rejected').length;
+  }
+
+  getBmiClass(bmi: number | string | undefined): string {
+    const val = Number(bmi);
+    if (!val || isNaN(val)) return 'text-muted';
+    if (val < 18.5) return 'text-info';
+    if (val < 25) return 'text-success';
+    if (val < 30) return 'text-warning';
+    return 'text-danger';
+  }
+
+  getBmiLabel(bmi: number | string | undefined): string {
+    const val = Number(bmi);
+    if (!val || isNaN(val)) return 'N/A';
+    if (val < 18.5) return 'Underweight';
+    if (val < 25) return 'Normal';
+    if (val < 30) return 'Overweight';
+    return 'Obese';
+  }
+
+  browseWorkouts(): void {
+    this.router.navigate(['/userviewworkout']);
+  }
+
+  openDeleteModal(id: number): void {
+    this.selectedRequestId = id;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.selectedRequestId = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.selectedRequestId) return;
+    this.workoutReqService.deleteWorkoutApplication(this.selectedRequestId).subscribe({
+      next: () => {
+        this.appliedList = this.appliedList.filter(item => item.workoutRequestId !== this.selectedRequestId);
+        this.applyFilter();
+        this.closeDeleteModal();
+      },
+      error: () => {
+        this.appliedList = this.appliedList.filter(item => item.workoutRequestId !== this.selectedRequestId);
+        this.applyFilter();
+        this.closeDeleteModal();
+      }
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FeedbackService } from 'src/app/services/feedback.service';
-import { Modal } from 'bootstrap';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -9,26 +9,34 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./userviewfeedback.component.css']
 })
 export class UserviewfeedbackComponent implements OnInit {
-
   feedbacks: any[] = [];
+  filteredFeedbacks: any[] = [];
   userId!: string;
   isLoading = false;
+  serverError = '';
+  searchTerm = '';
 
-  viewItem: any;
-  deleteItem: any;
+  // Modal states
+  showViewModal = false;
+  viewItem: any = null;
+  showDeleteModal = false;
+  deleteItem: any = null;
 
-  message = '';
+  // Pagination
+  currentPage = 1;
+  pageSize = 6;
+  Math = Math;
 
   constructor(
     private feedbackService: FeedbackService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     const id = this.authService.getUserId();
     if (!id) {
-      this.message = 'User not logged in';
-      this.openModal('statusModal');
+      this.serverError = 'You must be logged in to view your feedback.';
       return;
     }
     this.userId = id;
@@ -37,33 +45,85 @@ export class UserviewfeedbackComponent implements OnInit {
 
   loadFeedbacks(): void {
     this.isLoading = true;
+    this.serverError = '';
     this.feedbackService.getAllFeedbacksByUserId(this.userId).subscribe({
       next: (data: any[]) => {
         this.feedbacks = (data || []).map(f => ({
           ...f,
-          feedbackText: f.feedbackText || f.FeedbackText
+          feedbackId: f.feedbackId ?? f['FeedbackId'],
+          feedbackText: f.feedbackText ?? f['FeedbackText'],
+          date: f.date ?? f['Date']
         }));
+        this.onSearch();
         this.isLoading = false;
       },
       error: () => {
         this.isLoading = false;
-        this.message = 'Failed to load feedbacks';
-        this.openModal('statusModal');
+        this.serverError = 'Failed to load your feedback history.';
       }
     });
   }
 
-  viewFeedback(f: any): void {
-    this.viewItem = {
-      ...f,
-      feedbackText: f.feedbackText || f.FeedbackText
-    };
-    this.openModal('viewModal');
+  onSearch(): void {
+    this.currentPage = 1;
+    const term = (this.searchTerm || '').trim().toLowerCase();
+
+    if (!term) {
+      this.filteredFeedbacks = [...this.feedbacks];
+      return;
+    }
+
+    this.filteredFeedbacks = this.feedbacks.filter(f => {
+      const text = (f.feedbackText || '').toLowerCase();
+      return text.includes(term);
+    });
   }
 
-  openDelete(f: any): void {
-    this.deleteItem = f;
-    this.openModal('deleteModal');
+  get paginatedFeedbacks(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredFeedbacks.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredFeedbacks.length / this.pageSize);
+  }
+
+  get pageNumbers(): number[] {
+    const pages = [];
+    for (let i = 1; i <= this.totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  addNewFeedback(): void {
+    this.router.navigate(['/useraddfeedback']);
+  }
+
+  openViewModal(item: any): void {
+    this.viewItem = item;
+    this.showViewModal = true;
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.viewItem = null;
+  }
+
+  openDeleteModal(item: any): void {
+    this.deleteItem = item;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.deleteItem = null;
   }
 
   confirmDelete(): void {
@@ -71,39 +131,19 @@ export class UserviewfeedbackComponent implements OnInit {
 
     this.feedbackService.deleteFeedback(this.deleteItem.feedbackId).subscribe({
       next: () => {
-        this.afterDeleteSuccess();
+        this.feedbacks = this.feedbacks.filter(
+          f => f.feedbackId !== this.deleteItem.feedbackId
+        );
+        this.onSearch();
+        this.closeDeleteModal();
       },
       error: () => {
-        this.afterDeleteSuccess();
+        this.feedbacks = this.feedbacks.filter(
+          f => f.feedbackId !== this.deleteItem.feedbackId
+        );
+        this.onSearch();
+        this.closeDeleteModal();
       }
     });
-  }
-
-  afterDeleteSuccess(): void {
-    this.feedbacks = this.feedbacks.filter(
-      f => f.feedbackId !== this.deleteItem.feedbackId
-    );
-
-    this.deleteItem = undefined;
-    this.closeModal('deleteModal');
-  }
-
-  cancelDelete(): void {
-    this.deleteItem = undefined;
-    this.closeModal('deleteModal');
-  }
-
-  openModal(id: string) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    let modal = Modal.getInstance(el);
-    if (!modal) modal = new Modal(el);
-    modal.show();
-  }
-
-  closeModal(id: string) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    Modal.getInstance(el)?.hide();
   }
 }

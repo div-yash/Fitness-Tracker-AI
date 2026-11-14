@@ -1,41 +1,181 @@
-<div class="container mt-4">
-    <h2 class="text-center mb-4">Feedback Details</h2>
-
-    <div *ngIf="errorMessage" class="alert alert-danger">
-        {{errorMessage}}
+<div class="page py-4">
+  <!-- Header Section -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h2 class="title m-0">
+        <i class="bi bi-chat-heart-fill text-primary me-2"></i>Athlete Reviews & Feedback
+      </h2>
+      <p class="text-secondary small mt-1 mb-0">
+        Inspect athlete experiences, workout reviews, and community training feedback.
+      </p>
     </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-dark border border-secondary text-secondary px-3 py-2 rounded-pill">
+        <i class="bi bi-chat-quote me-1"></i> {{ filteredList.length }} Reviews
+      </span>
+    </div>
+  </div>
 
-    <div *ngIf="isLoading" class="text-center my-4">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+  <!-- Search & Row Configuration Bar -->
+  <div class="card p-3 mb-4 shadow-sm border-0 toolbar-card">
+    <div class="row g-3 align-items-center">
+      <!-- Search Input -->
+      <div class="col-12 col-md-6 col-lg-5">
+        <div class="input-group">
+          <span class="input-group-text search-icon-addon">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input
+            type="search"
+            class="form-control search-input"
+            placeholder="Search by athlete name or review text..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch()"
+            aria-label="Search feedback"
+          />
+          <button *ngIf="searchTerm" class="btn btn-dark border-start-0" (click)="searchTerm = ''; onSearch()">
+            <i class="bi bi-x"></i>
+          </button>
         </div>
-        <p>Fetching feedbacks...</p>
+      </div>
+
+      <!-- Rows Per Page -->
+      <div class="col-12 col-md-6 col-lg-7 d-flex justify-content-md-end align-items-center gap-2">
+        <span class="text-muted small">Show:</span>
+        <select class="form-select form-select-sm rows-dropdown" [(ngModel)]="pageSize" (change)="onPageSizeChange()" style="width: 76px;">
+          <option [ngValue]="6">6</option>
+          <option [ngValue]="9">9</option>
+          <option [ngValue]="18">18</option>
+          <option [ngValue]="36">36</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- States Handling -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div class="mt-2 text-secondary small">Fetching athlete feedback...</div>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="card p-4 text-center my-4 border-danger">
+    <i class="bi bi-exclamation-triangle-fill text-danger fs-3 mb-2"></i>
+    <div class="text-white">{{ errorMessage }}</div>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && filteredList.length === 0" class="card p-5 text-center my-4 empty-card">
+    <div class="empty-icon-wrap mb-3">
+      <i class="bi bi-chat-square-dots"></i>
+    </div>
+    <h5 class="text-white mb-1">No Reviews Found</h5>
+    <p class="text-secondary small mb-3">
+      {{ searchTerm ? 'No reviews match your search query.' : 'There is currently no athlete feedback submitted.' }}
+    </p>
+    <div *ngIf="searchTerm">
+      <button class="btn btn-outline-primary btn-sm" (click)="searchTerm = ''; onSearch()">
+        Clear Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Responsive Card Boxes Grid (3 per row) -->
+  <div class="row g-4 mb-4" *ngIf="!isLoading && !errorMessage && paginatedFeedbacks.length > 0">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let feedback of paginatedFeedbacks">
+      <div class="review-box-card h-100 d-flex flex-column justify-content-between">
+        
+        <!-- Top Section -->
+        <div>
+          <!-- Card Header: User Avatar + Name + Date -->
+          <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-dark-subtle">
+            <div class="d-flex align-items-center gap-2">
+              <div class="user-avatar">
+                {{ getInitials(feedback.user?.username || ('Athlete ' + feedback.userId)) }}
+              </div>
+              <div>
+                <h6 class="user-name mb-0 text-white text-truncate" style="max-width: 150px;">
+                  {{ feedback.user?.username || ('Athlete #' + feedback.userId) }}
+                </h6>
+                <span class="text-muted small" style="font-size: 11px;">
+                  <i class="bi bi-calendar3 me-1"></i>{{ feedback.date | date:'mediumDate' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Review Badge -->
+            <span class="badge review-badge">
+              <i class="bi bi-star-fill text-warning me-1"></i>Verified
+            </span>
+          </div>
+
+          <!-- Feedback Quote Box -->
+          <div class="feedback-content-box p-3 mb-3 rounded-3 position-relative">
+            <i class="bi bi-quote quote-icon"></i>
+            <p class="feedback-text text-white mb-0">
+              {{ feedback.feedbackText }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="pt-2 border-top border-dark-subtle d-flex justify-content-between align-items-center">
+          <span class="text-muted small" style="font-size: 11px;">
+            <i class="bi bi-person-badge me-1"></i>User ID: #{{ feedback.userId }}
+          </span>
+          <button
+            class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-3 py-1 fw-semibold"
+            (click)="confirmDelete(feedback.feedbackId)"
+          >
+            <i class="bi bi-trash3"></i>
+            <span>Delete</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="d-flex justify-content-center align-items-center gap-2 mt-4" *ngIf="totalPages > 1">
+    <button class="btn btn-sm page-nav-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+      <i class="bi bi-chevron-left me-1"></i> Prev
+    </button>
+    
+    <div class="d-flex gap-1">
+      <button
+        *ngFor="let p of pageNumbers"
+        class="btn btn-sm page-num-btn"
+        [class.active]="p === currentPage"
+        (click)="setPage(p)"
+      >
+        {{ p }}
+      </button>
     </div>
 
-    <table class="table table-bordered table-striped" *ngIf="!isLoading && feedbackList.length > 0">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>User ID</th>
-                <th>Feedback</th>
-                <th>Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let feedback of feedbackList; let i=index">
-                <td>{{i+1}}</td>
-                <td>{{feedback.userId}}</td>
-                <td>{{feedback.feedbackText}}</td>
-                <td>{{feedback.date | date:'mediumDate'}}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm" (click)="deleteFeedback(feedback.feedbackId)">Delete</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <button class="btn btn-sm page-nav-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+      Next <i class="bi bi-chevron-right ms-1"></i>
+    </button>
+  </div>
 
-    <div *ngIf="!isLoading && feedbackList.length === 0 && !errorMessage" class="alert alert-info text-center">
-        No feedback available
+  <!-- Delete Confirmation Modal -->
+  <div class="custom-modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-icon bg-danger-subtle text-danger mb-3">
+        <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+      </div>
+      <h5 class="text-white fw-bold mb-2">Delete Review?</h5>
+      <p class="text-secondary small mb-4">
+        Are you sure you want to permanently remove this feedback? This action cannot be reversed.
+      </p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn btn-outline-secondary px-4 py-2" (click)="closeDeleteModal()">
+          Cancel
+        </button>
+        <button class="btn btn-danger px-4 py-2 fw-semibold d-flex align-items-center gap-2" (click)="executeDelete()">
+          <i class="bi bi-trash3-fill"></i>
+          <span>Delete Review</span>
+        </button>
+      </div>
     </div>
+  </div>
+
 </div>

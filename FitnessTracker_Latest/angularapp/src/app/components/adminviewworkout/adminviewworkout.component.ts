@@ -14,12 +14,13 @@ export class AdminviewworkoutComponent implements OnInit {
   loading = false;
   serverError = '';
   searchTerm = '';
+  selectedDifficulty = 'all';
   selectedWorkoutId: number | null = null;
   showDeleteModal = false;
 
   // Pagination & Sorting properties
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 9; // 9 cards per page for 3x3 grid
   sortColumn = '';
   sortAscending = true;
   Math = Math;
@@ -35,7 +36,7 @@ export class AdminviewworkoutComponent implements OnInit {
     this.workoutService.getAllWorkouts().subscribe({
       next: data => {
         this.workouts = data || [];
-        this.filtered = [...this.workouts];
+        this.onSearch();
         this.loading = false;
       },
       error: () => {
@@ -45,20 +46,31 @@ export class AdminviewworkoutComponent implements OnInit {
     });
   }
 
+  setDifficultyFilter(diff: string): void {
+    this.selectedDifficulty = diff;
+    this.onSearch();
+  }
+
   onSearch(): void {
     this.currentPage = 1;
     const t = (this.searchTerm || '').trim().toLowerCase();
 
-    if (!t) {
-      this.filtered = [...this.workouts];
-      return;
-    }
-  
     this.filtered = this.workouts.filter(w => {
+      // 1. Difficulty filter
+      if (this.selectedDifficulty !== 'all') {
+        const diffLabel = this.getDifficultyLabel(w.difficultyLevel).toLowerCase();
+        if (diffLabel !== this.selectedDifficulty.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 2. Search query filter
+      if (!t) return true;
       const name = (w.workoutName || w['WorkoutName'] || '').toString().toLowerCase();
       const desc = (w.description || w['Description'] || '').toString().toLowerCase();
+      const target = (w.targetArea || w['TargetArea'] || '').toString().toLowerCase();
       
-      return name.includes(t) || desc.includes(t);
+      return name.includes(t) || desc.includes(t) || target.includes(t);
     });
   }
 
@@ -133,6 +145,10 @@ export class AdminviewworkoutComponent implements OnInit {
     if (level <= 2) return 'badge-beginner';
     if (level <= 4) return 'badge-intermediate';
     return 'badge-expert';
+  }
+
+  createWorkout(): void {
+    this.router.navigate(['/adminaddworkout']);
   }
 
   editWorkout(id: number | undefined): void {

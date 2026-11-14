@@ -1,64 +1,262 @@
-<div class="container mt-4">
-
-    <h3 class="text-primary mb-3">My Applied Workouts</h3>
-  
-    <div *ngIf="message" class="alert alert-info">{{ message }}</div>
-  
-    <div *ngIf="loading" class="text-center mb-3">
-      <div class="spinner-border text-primary"></div>
+<div class="container py-4">
+  <!-- Section Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h2 class="section-title m-0">
+        <i class="bi bi-journal-bookmark-fill text-primary me-2"></i>My Enrolled Programs & Requests
+      </h2>
+      <p class="text-secondary small mt-1 mb-0">
+        Track your workout enrollments, review coach feedback, and manage your training journey.
+      </p>
     </div>
-  
-    <table *ngIf="!loading && appliedList.length > 0"
-           class="table table-bordered table-striped">
-  
-      <thead class="table-dark">
-        <tr>
-          <th>Request ID</th>
-          <th>Workout Name</th>
-          <th>Age</th>
-          <th>BMI</th>
-          <th>Gender</th>
-          <th>Diet</th>
-          <th>Medical History</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-  
-      <tbody>
-        <tr *ngFor="let item of appliedList">
-  
-          <td>{{ item.workoutRequestId }}</td>
-          <td>{{ item.workoutName }}</td>
-          <td>{{ item.age }}</td>
-          <td>{{ item.bmi }}</td>
-          <td>{{ item.gender }}</td>
-          <td>{{ item.dietaryPreferences }}</td>
-          <td>{{ item.medicalHistory }}</td>
-          <td>{{ item.requestedDate | date:'mediumDate' }}</td>
-  
-          <td>
-            <span class="badge"
-                  [ngClass]="{
-                    'bg-warning text-dark': item.requestStatus === 'Pending',
-                    'bg-success': item.requestStatus === 'Approved',
-                    'bg-danger': item.requestStatus === 'Rejected'
-                  }">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-dark border border-secondary text-secondary px-3 py-2 rounded-pill">
+        <i class="bi bi-collection me-1"></i> Total: {{ totalCount }}
+      </span>
+      <button class="btn btn-primary btn-sm px-3 py-2 fw-semibold d-flex align-items-center gap-2 rounded-pill" (click)="browseWorkouts()">
+        <i class="bi bi-plus-lg"></i>
+        <span>Explore Plans</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search & Filter Toolbar -->
+  <div class="card p-3 mb-4 shadow-sm border-0 toolbar-card">
+    <div class="row g-3 align-items-center">
+      <!-- Search Input -->
+      <div class="col-12 col-md-5 col-lg-4">
+        <div class="input-group">
+          <span class="input-group-text search-icon-addon">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input
+            type="search"
+            class="form-control search-input"
+            placeholder="Search by workout, diet, notes..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilter()"
+            aria-label="Search my requests"
+          />
+          <button *ngIf="searchTerm" class="btn btn-dark border-start-0" (click)="searchTerm = ''; applyFilter()">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Filter Tabs -->
+      <div class="col-12 col-md-7 col-lg-8">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+          <button
+            class="btn filter-tab-btn"
+            [class.active]="statusFilter === 'all'"
+            (click)="setFilter('all')"
+          >
+            All <span class="tab-badge">{{ totalCount }}</span>
+          </button>
+          <button
+            class="btn filter-tab-btn tab-pending"
+            [class.active]="statusFilter === 'pending'"
+            (click)="setFilter('pending')"
+          >
+            <i class="bi bi-hourglass-split me-1 text-warning"></i> Pending
+            <span class="tab-badge tab-badge-pending">{{ pendingCount }}</span>
+          </button>
+          <button
+            class="btn filter-tab-btn tab-approved"
+            [class.active]="statusFilter === 'approved'"
+            (click)="setFilter('approved')"
+          >
+            <i class="bi bi-check-circle-fill me-1 text-success"></i> Approved
+            <span class="tab-badge tab-badge-approved">{{ approvedCount }}</span>
+          </button>
+          <button
+            class="btn filter-tab-btn tab-rejected"
+            [class.active]="statusFilter === 'rejected'"
+            (click)="setFilter('rejected')"
+          >
+            <i class="bi bi-x-circle-fill me-1 text-danger"></i> Rejected
+            <span class="tab-badge tab-badge-rejected">{{ rejectedCount }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-secondary small mt-2">Loading your applications...</p>
+  </div>
+
+  <!-- Server Error -->
+  <div *ngIf="!loading && serverError" class="card p-4 text-center my-4 border-danger">
+    <i class="bi bi-exclamation-triangle-fill text-danger fs-3 mb-2"></i>
+    <div class="text-white">{{ serverError }}</div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="card p-5 text-center my-4 empty-card" *ngIf="!loading && !serverError && filteredList.length === 0">
+    <div class="empty-icon-wrap mb-3">
+      <i class="bi bi-journal-x"></i>
+    </div>
+    <h5 class="text-white mb-1">No Applications Found</h5>
+    <p class="text-secondary small mb-3">
+      {{ searchTerm || statusFilter !== 'all' ? 'Try adjusting your search filters.' : 'You have not enrolled in any workout plans yet.' }}
+    </p>
+    <div>
+      <button class="btn btn-primary btn-sm px-4 py-2" (click)="browseWorkouts()" *ngIf="appliedList.length === 0">
+        Browse Available Plans
+      </button>
+      <button class="btn btn-outline-primary btn-sm" (click)="searchTerm = ''; statusFilter = 'all'; applyFilter()" *ngIf="appliedList.length > 0">
+        Reset Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Responsive Card Boxes Grid (3 per row) -->
+  <div class="row g-4" *ngIf="!loading && !serverError && filteredList.length > 0">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let item of filteredList">
+      <div class="applied-card h-100 d-flex flex-column justify-content-between">
+        
+        <!-- Top Section -->
+        <div>
+          <!-- Header: Target Area Pill & Status Badge -->
+          <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-dark-subtle">
+            <span class="badge badge-target">
+              <i class="bi bi-bullseye me-1"></i>{{ item.targetArea || 'Training Plan' }}
+            </span>
+
+            <!-- Status Badge -->
+            <span
+              class="badge status-badge"
+              [ngClass]="{
+                'status-pending': (item.requestStatus || '').toLowerCase() === 'pending',
+                'status-approved': (item.requestStatus || '').toLowerCase() === 'approved',
+                'status-rejected': (item.requestStatus || '').toLowerCase() === 'rejected'
+              }"
+            >
+              <i
+                class="bi me-1"
+                [ngClass]="{
+                  'bi-hourglass-split': (item.requestStatus || '').toLowerCase() === 'pending',
+                  'bi-check-circle-fill': (item.requestStatus || '').toLowerCase() === 'approved',
+                  'bi-x-circle-fill': (item.requestStatus || '').toLowerCase() === 'rejected'
+                }"
+              ></i>
               {{ item.requestStatus }}
             </span>
-          </td>
-  
-          <td>
-            <button class="btn btn-sm btn-danger"
-                    (click)="deleteApplication(item.workoutRequestId)">
-              Delete
-            </button>
-          </td>
-  
-        </tr>
-      </tbody>
-  
-    </table>
+          </div>
+
+          <!-- Workout Plan Title & Date -->
+          <div class="mb-3">
+            <h4 class="workout-title text-white mb-1 text-truncate" [title]="item.workoutName">
+              {{ item.workoutName }}
+            </h4>
+            <span class="text-muted small" style="font-size: 11.5px;">
+              <i class="bi bi-calendar3 me-1"></i>Submitted: {{ item.requestedDate | date:'mediumDate' }}
+            </span>
+          </div>
+
+          <!-- Status Message Banner -->
+          <div
+            class="status-notice-box p-2 mb-3 rounded-2 d-flex align-items-center gap-2"
+            [ngClass]="{
+              'notice-pending': (item.requestStatus || '').toLowerCase() === 'pending',
+              'notice-approved': (item.requestStatus || '').toLowerCase() === 'approved',
+              'notice-rejected': (item.requestStatus || '').toLowerCase() === 'rejected'
+            }"
+          >
+            <i
+              class="bi"
+              [ngClass]="{
+                'bi-clock-history': (item.requestStatus || '').toLowerCase() === 'pending',
+                'bi-patch-check-fill': (item.requestStatus || '').toLowerCase() === 'approved',
+                'bi-x-octagon-fill': (item.requestStatus || '').toLowerCase() === 'rejected'
+              }"
+            ></i>
+            <span class="small fw-semibold">
+              <ng-container *ngIf="(item.requestStatus || '').toLowerCase() === 'pending'">
+                Under coach review. Regimen will unlock once approved.
+              </ng-container>
+              <ng-container *ngIf="(item.requestStatus || '').toLowerCase() === 'approved'">
+                Approved! You are active in this training track.
+              </ng-container>
+              <ng-container *ngIf="(item.requestStatus || '').toLowerCase() === 'rejected'">
+                Not approved for health/diet safety reasons.
+              </ng-container>
+            </span>
+          </div>
+
+          <!-- Biometrics Quad Grid -->
+          <div class="biometrics-grid mb-3">
+            <div class="stat-pill">
+              <span class="stat-pill-label">Age</span>
+              <span class="stat-pill-val text-white">{{ item.age || '--' }} yrs</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">BMI</span>
+              <span class="stat-pill-val" [ngClass]="getBmiClass(item.bmi)">
+                {{ item.bmi || '--' }} <small>({{ getBmiLabel(item.bmi) }})</small>
+              </span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">Gender</span>
+              <span class="stat-pill-val text-white">{{ item.gender || '--' }}</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-pill-label">Diet</span>
+              <span class="stat-pill-val text-info text-truncate" [title]="item.dietaryPreferences || 'Standard'">
+                {{ item.dietaryPreferences || 'Standard' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Medical Note (if present) -->
+          <div class="medical-snippet p-2 rounded-2 mb-3" *ngIf="item.medicalHistory">
+            <div class="d-flex align-items-center gap-1 text-muted small fw-semibold mb-1" style="font-size: 11px;">
+              <i class="bi bi-shield-plus text-warning"></i> Medical Notes
+            </div>
+            <p class="small text-secondary mb-0 text-truncate" [title]="item.medicalHistory">
+              {{ item.medicalHistory }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Bottom Action Area -->
+        <div class="pt-2 border-top border-dark-subtle">
+          <button
+            class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2 py-2"
+            (click)="openDeleteModal(item.workoutRequestId)"
+          >
+            <i class="bi bi-trash3"></i>
+            <span>Cancel Request</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
   </div>
-  
+
+  <!-- Delete Modal -->
+  <div class="custom-modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header-icon bg-danger-subtle text-danger mb-3">
+        <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+      </div>
+      <h5 class="text-white fw-bold mb-2">Cancel Workout Application?</h5>
+      <p class="text-secondary small mb-4">
+        Are you sure you want to cancel this application? If it was approved, you will lose your enrolled spot in this regimen.
+      </p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn btn-outline-secondary px-4 py-2" (click)="closeDeleteModal()">
+          Keep It
+        </button>
+        <button class="btn btn-danger px-4 py-2 fw-semibold d-flex align-items-center gap-2" (click)="confirmDelete()">
+          <i class="bi bi-trash3-fill"></i>
+          <span>Yes, Cancel</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

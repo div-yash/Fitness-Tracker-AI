@@ -1,143 +1,208 @@
 <div class="page py-4">
-    <!-- Header Section -->
-    <div class="text-center mb-4">
-        <h2 class="title d-inline-block position-relative">
-            Available Workouts
-            <span class="workouts-count">{{ filteredWorkouts.length }} workouts</span>
-        </h2>
-        <div class="title-underline"></div>
+  <!-- Header Section -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h2 class="title m-0">
+        <i class="bi bi-activity text-primary me-2"></i>Available Workout Plans
+      </h2>
+      <p class="text-secondary small mt-1 mb-0">
+        Choose from expert-designed training regimens tailored for endurance, strength, and mobility.
+      </p>
     </div>
+    <div>
+      <span class="badge bg-dark border border-secondary text-secondary px-3 py-2 rounded-pill">
+        <i class="bi bi-fire text-warning me-1"></i> {{ filteredWorkouts.length }} Plans Available
+      </span>
+    </div>
+  </div>
 
-    <!-- Search & Row Configuration Bar -->
-    <div class="search-row d-flex justify-content-between align-items-center flex-wrap mb-4 gap-3">
-        <div class="search-container position-relative flex-grow-1" style="max-width: 380px;">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" class="search-input ps-5" placeholder="Search by Workout Name, Difficulty, or Target Area..."
-                [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+  <!-- Search & Filter Toolbar -->
+  <div class="card p-3 mb-4 shadow-sm border-0 toolbar-card">
+    <div class="row g-3 align-items-center">
+      <!-- Search Input -->
+      <div class="col-12 col-md-5 col-lg-4">
+        <div class="input-group">
+          <span class="input-group-text search-icon-addon">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="Search by name, muscle area..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilter()"
+          />
+          <button *ngIf="searchTerm" class="btn btn-dark border-start-0" (click)="searchTerm = ''; applyFilter()">
+            <i class="bi bi-x"></i>
+          </button>
         </div>
-        
-        <div class="rows-selector d-flex align-items-center gap-2">
-            <span class="text-secondary small font-weight-bold">Rows:</span>
-            <select class="form-select rows-dropdown" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-                <option [ngValue]="5">5</option>
-                <option [ngValue]="10">10</option>
-                <option [ngValue]="20">20</option>
-                <option [ngValue]="50">50</option>
+      </div>
+
+      <!-- Difficulty Filter Pills -->
+      <div class="col-12 col-md-7 col-lg-8">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
+          <button
+            class="btn filter-tab-btn"
+            [class.active]="selectedDifficulty === 'all'"
+            (click)="setDifficultyFilter('all')"
+          >
+            All Levels
+          </button>
+          <button
+            class="btn filter-tab-btn tab-beginner"
+            [class.active]="selectedDifficulty === 'beginner'"
+            (click)="setDifficultyFilter('beginner')"
+          >
+            <i class="bi bi-circle-fill me-1 text-success" style="font-size: 8px;"></i> Beginner
+          </button>
+          <button
+            class="btn filter-tab-btn tab-intermediate"
+            [class.active]="selectedDifficulty === 'intermediate'"
+            (click)="setDifficultyFilter('intermediate')"
+          >
+            <i class="bi bi-circle-fill me-1 text-info" style="font-size: 8px;"></i> Intermediate
+          </button>
+          <button
+            class="btn filter-tab-btn tab-expert"
+            [class.active]="selectedDifficulty === 'expert'"
+            (click)="setDifficultyFilter('expert')"
+          >
+            <i class="bi bi-circle-fill me-1 text-danger" style="font-size: 8px;"></i> Expert
+          </button>
+
+          <!-- Per-Page Selector -->
+          <div class="ms-lg-3 d-flex align-items-center gap-1">
+            <span class="text-muted small">Show:</span>
+            <select class="form-select form-select-sm rows-dropdown" [(ngModel)]="pageSize" (change)="onPageSizeChange()" style="width: 70px;">
+              <option [ngValue]="6">6</option>
+              <option [ngValue]="9">9</option>
+              <option [ngValue]="18">18</option>
+              <option [ngValue]="36">36</option>
             </select>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- States handling -->
-    <div *ngIf="loading" class="state py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <div class="mt-2 text-secondary">Loading workouts...</div>
-    </div>
-    <div *ngIf="!loading && serverError" class="state error py-5">
-        <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
-        <div class="mt-2">{{ serverError }}</div>
-    </div>
-    <div *ngIf="!loading && !serverError && filteredWorkouts.length === 0" class="state py-5 text-muted">
-        <i class="bi bi-info-circle fs-3"></i>
-        <div class="mt-2">No workouts found.</div>
-    </div>
+  <!-- States Handling -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div class="mt-2 text-secondary small">Loading available plans...</div>
+  </div>
 
-    <!-- Table Layout -->
-    <div class="table-wrap" *ngIf="!loading && !serverError && filteredWorkouts.length > 0">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th style="width: 70px;">#</th>
-                    <th class="sortable" (click)="setSort('workoutName')">
-                        Workout Name 
-                        <i class="bi" [ngClass]="sortColumn === 'workoutName' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
-                    </th>
-                    <th>Description</th>
-                    <th class="sortable" (click)="setSort('difficultyLevel')" style="width: 150px;">
-                        Difficulty 
-                        <i class="bi" [ngClass]="sortColumn === 'difficultyLevel' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
-                    </th>
-                    <th class="sortable" (click)="setSort('targetArea')" style="width: 150px;">
-                        Target Area 
-                        <i class="bi" [ngClass]="sortColumn === 'targetArea' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
-                    </th>
-                    <th class="sortable" (click)="setSort('daysPerWeek')" style="width: 140px;">
-                        Days / Week 
-                        <i class="bi" [ngClass]="sortColumn === 'daysPerWeek' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
-                    </th>
-                    <th class="sortable" (click)="setSort('averageWorkoutDurationInMinutes')" style="width: 150px;">
-                        Duration (Min) 
-                        <i class="bi" [ngClass]="sortColumn === 'averageWorkoutDurationInMinutes' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
-                    </th>
-                    <th class="sortable" (click)="setSort('createdAt')" style="width: 160px;">
-                        Created 
-                        <i class="bi" [ngClass]="sortColumn === 'createdAt' ? (sortAscending ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-caret-down'"></i>
-                    </th>
-                    <th style="width: 150px; text-align: center;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of paginatedWorkouts; let i = index;">
-                    <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-                    <td class="workout-name-cell">{{ item.workoutName }}</td>
-                    <td class="description-cell">{{ item.description }}</td>
-                    <td>
-                        <span class="difficulty-badge" [ngClass]="getDifficultyClass(item.difficultyLevel)">
-                            {{ getDifficultyLabel(item.difficultyLevel) }}
-                        </span>
-                    </td>
-                    <td>{{ item.targetArea }}</td>
-                    <td>{{ item.daysPerWeek }}x</td>
-                    <td>{{ item.averageWorkoutDurationInMinutes }}</td>
-                    <td>{{ item.createdAt | date:'MMM d, y' }}</td>
-                    <td class="text-center">
-                        <button
-                            class="btn btn-action-pill"
-                            [ngClass]="isApplied(item.workoutId) ? 'btn-applied' : 'btn-apply'"
-                            [disabled]="isApplied(item.workoutId)"
-                            (click)="onApply(item.workoutId)">
-                            <i class="bi" [ngClass]="isApplied(item.workoutId) ? 'bi-check-circle-fill me-1' : 'bi-plus-circle-fill me-1'"></i>
-                            {{ isApplied(item.workoutId) ? 'Applied' : 'Apply' }}
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+  <div *ngIf="!loading && serverError" class="card p-4 text-center my-4 border-danger">
+    <i class="bi bi-exclamation-triangle-fill text-danger fs-3 mb-2"></i>
+    <div class="text-white">{{ serverError }}</div>
+  </div>
 
-        <!-- Table Footer: Pagination -->
-        <div class="table-footer d-flex justify-content-between align-items-center flex-wrap p-3 border-top border-secondary">
-            <div class="footer-info text-secondary small">
-                Showing {{ (currentPage - 1) * pageSize + 1 }}–{{ Math.min(currentPage * pageSize, filteredWorkouts.length) }} of {{ filteredWorkouts.length }} results
+  <div *ngIf="!loading && !serverError && filteredWorkouts.length === 0" class="card p-5 text-center my-4 empty-card">
+    <div class="empty-icon-wrap mb-3">
+      <i class="bi bi-search"></i>
+    </div>
+    <h5 class="text-white mb-1">No Workouts Found</h5>
+    <p class="text-secondary small mb-3">No plans match your current search or filter.</p>
+    <div>
+      <button class="btn btn-outline-primary btn-sm" (click)="searchTerm = ''; selectedDifficulty = 'all'; applyFilter()">
+        Reset Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Responsive Card Boxes Grid (3 per row on desktop, 2 on tablet, 1 on mobile) -->
+  <div class="row g-4 mb-4" *ngIf="!loading && !serverError && paginatedWorkouts.length > 0">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let item of paginatedWorkouts">
+      <div class="workout-box-card h-100 d-flex flex-column justify-content-between">
+        
+        <!-- Top Info -->
+        <div>
+          <!-- Header Badges: Target Area + Difficulty -->
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="badge badge-target">
+              <i class="bi bi-bullseye me-1"></i>{{ item.targetArea || 'Full Body' }}
+            </span>
+
+            <span class="difficulty-badge" [ngClass]="getDifficultyClass(item.difficultyLevel)">
+              {{ getDifficultyLabel(item.difficultyLevel) }}
+            </span>
+          </div>
+
+          <!-- Workout Title -->
+          <h4 class="workout-card-title text-white mb-2" [title]="item.workoutName">
+            {{ item.workoutName }}
+          </h4>
+
+          <!-- Description -->
+          <p class="workout-card-desc text-secondary mb-3">
+            {{ item.description }}
+          </p>
+        </div>
+
+        <!-- Middle & Action Bottom -->
+        <div>
+          <!-- Metrics Grid -->
+          <div class="workout-metrics-grid mb-3">
+            <div class="metric-pill">
+              <span class="metric-label">Schedule</span>
+              <span class="metric-value text-white">
+                <i class="bi bi-calendar-week text-primary me-1"></i>{{ item.daysPerWeek }}d / week
+              </span>
             </div>
-            
-            <nav *ngIf="totalPages > 1">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item" [class.disabled]="currentPage === 1">
-                        <button class="page-link" (click)="setPage(1)">
-                            <i class="bi bi-chevron-double-left"></i>
-                        </button>
-                    </li>
-                    <li class="page-item" [class.disabled]="currentPage === 1">
-                        <button class="page-link" (click)="setPage(currentPage - 1)">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                    </li>
-                    
-                    <li class="page-item" *ngFor="let p of pageNumbers" [class.active]="currentPage === p">
-                        <button class="page-link" (click)="setPage(p)">{{ p }}</button>
-                    </li>
+            <div class="metric-pill">
+              <span class="metric-label">Session</span>
+              <span class="metric-value text-white">
+                <i class="bi bi-clock text-warning me-1"></i>{{ item.averageWorkoutDurationInMinutes }} mins
+              </span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-label">Intensity</span>
+              <span class="metric-value text-white">
+                <i class="bi bi-lightning-charge text-danger me-1"></i>Level {{ item.difficultyLevel }}/5
+              </span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-label">Est. Burn</span>
+              <span class="metric-value text-white">
+                <i class="bi bi-fire text-danger me-1"></i>~{{ (item.averageWorkoutDurationInMinutes || 30) * 8 }} kcal
+              </span>
+            </div>
+          </div>
 
-                    <li class="page-item" [class.disabled]="currentPage === totalPages">
-                        <button class="page-link" (click)="setPage(currentPage + 1)">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </li>
-                    <li class="page-item" [class.disabled]="currentPage === totalPages">
-                        <button class="page-link" (click)="setPage(totalPages)">
-                            <i class="bi bi-chevron-double-right"></i>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
+          <!-- Action Button -->
+          <button
+            class="btn w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+            [ngClass]="isApplied(item.workoutId) ? 'btn-enrolled' : 'btn-primary btn-apply-card'"
+            [disabled]="isApplied(item.workoutId)"
+            (click)="onApply(item.workoutId)"
+          >
+            <i class="bi" [ngClass]="isApplied(item.workoutId) ? 'bi-check-circle-fill' : 'bi-plus-circle'"></i>
+            <span>{{ isApplied(item.workoutId) ? 'Program Enrolled' : 'Apply For Program' }}</span>
+          </button>
         </div>
+
+      </div>
     </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="d-flex justify-content-center align-items-center gap-2 mt-4" *ngIf="totalPages > 1">
+    <button class="btn btn-sm page-nav-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+      <i class="bi bi-chevron-left me-1"></i> Prev
+    </button>
+    
+    <div class="d-flex gap-1">
+      <button
+        *ngFor="let p of pageNumbers"
+        class="btn btn-sm page-num-btn"
+        [class.active]="p === currentPage"
+        (click)="setPage(p)"
+      >
+        {{ p }}
+      </button>
+    </div>
+
+    <button class="btn btn-sm page-nav-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+      Next <i class="bi bi-chevron-right ms-1"></i>
+    </button>
+  </div>
 </div>

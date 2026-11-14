@@ -7,4 +7,6 @@ export interface Feedback {
     feedbackText?: string;
     Date?: Date;
     date?: Date;
+    user?: any;
+    User?: any;
 }
